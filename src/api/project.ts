@@ -1,5 +1,5 @@
-import { api } from "./axios";
-import { Project } from "../types/project";
+import type { api } from "./axios";
+import type { Project } from "../types/project";
 
 export const projectAPI = {
   getAll: async (): Promise<Project[]> => {

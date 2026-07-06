@@ -1,5 +1,5 @@
-import { api } from "./axios";
-import { Employee, Position } from "../types/employee";
+import type { api } from "./axios";
+import type { Employee, Position } from "../types/employee";
 
 export const employeeAPI = {
   getAll: async (): Promise<Employee[]> => {

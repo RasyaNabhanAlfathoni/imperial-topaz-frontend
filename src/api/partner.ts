@@ -1,5 +1,5 @@
-import { api } from "./axios";
-import { Partner } from "../types/partner";
+import type { api } from "./axios";
+import type { Partner } from "../types/partner";
 
 export const partnerAPI = {
   getAll: async (): Promise<Partner[]> => {

@@ -1,5 +1,5 @@
-import { api } from "./axios";
-import { News, NewsCategory } from "../types/news";
+import type { api } from "./axios";
+import type { News, NewsCategory } from "../types/news";
 
 export const newsAPI = {
   getAll: async (): Promise<News[]> => {

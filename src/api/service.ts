@@ -1,5 +1,5 @@
-import { api } from "./axios";
-import { Service } from "../types/service";
+import type { api } from "./axios";
+import type { Service } from "../types/service";
 
 export const serviceAPI = {
   getAll: async (): Promise<Service[]> => {
