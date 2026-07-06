@@ -1,0 +1,14 @@
+import { api } from "./axios";
+import { Service } from "../types/service";
+
+export const serviceAPI = {
+  getAll: async (): Promise<Service[]> => {
+    const response = await api.get("/api/v1/g/service");
+    return response.data;
+  },
+
+  getById: async (id: number): Promise<Service> => {
+    const response = await api.get(`/api/v1/g/service/${id}`);
+    return response.data;
+  },
+};
