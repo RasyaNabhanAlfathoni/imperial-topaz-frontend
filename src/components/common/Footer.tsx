@@ -7,11 +7,11 @@ import {
   ClockIcon,
 } from "@heroicons/react/24/outline";
 import {
-  FacebookIcon,
-  InstagramIcon,
-  YoutubeIcon,
-  TwitterIcon,
-} from "lucide-react";
+  FaFacebookF,
+  FaInstagram,
+  FaYoutube,
+  FaXTwitter,
+} from "react-icons/fa6";
 
 const Footer: React.FC = () => {
   return (
@@ -30,25 +30,25 @@ const Footer: React.FC = () => {
                 href="#"
                 className="text-gray-400 hover:text-blue-400 transition-colors"
               >
-                <FacebookIcon size={20} />
+                <FaFacebookF size={20} />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-400 transition-colors"
               >
-                <InstagramIcon size={20} />
+                <FaInstagram size={20} />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-400 transition-colors"
               >
-                <YoutubeIcon size={20} />
+                <FaYoutube size={20} />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-blue-400 transition-colors"
               >
-                <TwitterIcon size={20} />
+                <FaXTwitter size={20} />
               </a>
             </div>
           </div>
