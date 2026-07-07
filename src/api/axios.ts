@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-const apiClient = axios.create({
+const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
@@ -11,7 +11,7 @@ const apiClient = axios.create({
 });
 
 // Request interceptor
-apiClient.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     // Add any auth tokens here if needed
     return config;
@@ -22,7 +22,7 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor
-apiClient.interceptors.response.use(
+api.interceptors.response.use(
   (response) => {
     return response.data;
   },
@@ -42,4 +42,4 @@ apiClient.interceptors.response.use(
   },
 );
 
-export default apiClient;
+export default api;
