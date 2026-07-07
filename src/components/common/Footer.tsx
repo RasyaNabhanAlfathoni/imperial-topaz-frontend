@@ -1,168 +1,173 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import {
-  PhoneIcon,
-  EnvelopeIcon,
-  MapPinIcon,
-  ClockIcon,
-} from "@heroicons/react/24/outline";
 import {
   FaFacebookF,
   FaInstagram,
+  FaTwitter,
+  FaLinkedinIn,
   FaYoutube,
-  FaXTwitter,
-  FaLinkedin,
 } from "react-icons/fa6";
-import { motion } from "framer-motion";
 
-const Footer: React.FC = () => {
+const Footer = () => {
   return (
-    <footer className="bg-navy-600 text-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="font-bold text-xl">B</span>
-              </div>
-              <span className="text-2xl font-bold">BuildCore</span>
+    <footer className="bg-[#0F172A] text-white pt-16 pb-8">
+      <div className="container mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
+        {/* Brand */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-2xl font-bold">
+            <div className="w-8 h-8 bg-[#F97316] rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z" />
+              </svg>
             </div>
-            <p className="text-gray-400 mb-4">
-              Building tomorrow, together with quality and integrity.
-            </p>
-            <div className="flex space-x-3">
-              {[
-                FaFacebookF,
-                FaXTwitter,
-                FaInstagram,
-                FaLinkedin,
-                FaYoutube,
-              ].map((Icon, index) => (
-                <motion.a
-                  key={index}
-                  href="#"
-                  whileHover={{ y: -3 }}
-                  className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-orange-500 transition-colors"
-                >
-                  <Icon size={18} />
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              {[
-                "Home",
-                "About Us",
-                "Our Products",
-                "Our Services",
-                "Contact Us",
-              ].map((item) => (
-                <li key={item}>
-                  <Link
-                    to={
-                      item === "Home"
-                        ? "/"
-                        : `/${item.toLowerCase().replace(" ", "-")}`
-                    }
-                    className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Solutions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <h4 className="text-lg font-semibold mb-4">Solutions</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/products"
-                  className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
-                >
-                  Our Products
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/services"
-                  className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
-                >
-                  Our Services
-                </Link>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <MapPinIcon className="h-5 w-5 text-orange-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-400 text-sm">
-                  A. Reya Construction No. 88, Jakarta, Indonesia
-                </span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <PhoneIcon className="h-5 w-5 text-orange-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-400 text-sm">+62 812 3456 7890</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <EnvelopeIcon className="h-5 w-5 text-orange-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-400 text-sm">
-                  info@buildcore.co.id
-                </span>
-              </li>
-            </ul>
-          </motion.div>
+            BuildCore
+          </div>
+          <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
+            Building tomorrow, together with quality and integrity.
+          </p>
+          <div className="flex gap-4 pt-2">
+            <a
+              href="#"
+              className="bg-white/10 p-2 rounded-full hover:bg-[#F97316] transition-colors"
+            >
+              <FaFacebookF />
+            </a>
+            <a
+              href="#"
+              className="bg-white/10 p-2 rounded-full hover:bg-[#F97316] transition-colors"
+            >
+              <FaInstagram />
+            </a>
+            <a
+              href="#"
+              className="bg-white/10 p-2 rounded-full hover:bg-[#F97316] transition-colors"
+            >
+              <FaTwitter />
+            </a>
+            <a
+              href="#"
+              className="bg-white/10 p-2 rounded-full hover:bg-[#F97316] transition-colors"
+            >
+              <FaLinkedinIn />
+            </a>
+            <a
+              href="#"
+              className="bg-white/10 p-2 rounded-full hover:bg-[#F97316] transition-colors"
+            >
+              <FaYoutube />
+            </a>
+          </div>
         </div>
 
-        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <p className="text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} BuildCore. All rights reserved.
-          </p>
-          <div className="flex space-x-6 text-sm">
-            <Link
-              to="/privacy"
-              className="text-gray-400 hover:text-orange-400 transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              to="/terms"
-              className="text-gray-400 hover:text-orange-400 transition-colors"
-            >
-              Terms of Service
-            </Link>
+        {/* Quick Links */}
+        <div>
+          <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li>
+              <Link to="/" className="hover:text-[#F97316] transition-colors">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/products"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                Our Products
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/services"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                Our Services
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/projects"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                Projects
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                Contact Us
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Solutions */}
+        <div>
+          <h4 className="font-semibold text-lg mb-4">Solutions</h4>
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li>
+              <Link
+                to="/products"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                Our Products
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/services"
+                className="hover:text-[#F97316] transition-colors"
+              >
+                Our Services
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Contact & Newsletter */}
+        <div className="space-y-6">
+          <div>
+            <h4 className="font-semibold text-lg mb-4">Contact Info</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li>📞 +62 812 3456 7890</li>
+              <li>✉️ info@buildcore.co.id</li>
+              <li>📍 Jl. Raya Construction No. 88, Jakarta, Indonesia</li>
+            </ul>
           </div>
+          <div>
+            <h4 className="font-semibold text-lg mb-3">Newsletter</h4>
+            <div className="relative">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="w-full bg-[#1E293B] text-white rounded-md px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-[#F97316]"
+              />
+              <button className="absolute right-1 top-1 bottom-1 bg-[#F97316] px-3 rounded-md hover:bg-[#ea580c] flex items-center justify-center">
+                <span className="text-white">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-8 mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between text-xs text-gray-500">
+        <p>© 2026 BuildCore. All Rights Reserved.</p>
+        <div className="flex gap-6 mt-4 md:mt-0">
+          <Link to="#" className="hover:text-white">
+            Privacy Policy
+          </Link>
+          <Link to="#" className="hover:text-white">
+            Terms of Service
+          </Link>
         </div>
       </div>
     </footer>

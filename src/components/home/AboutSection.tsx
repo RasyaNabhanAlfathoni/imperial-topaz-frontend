@@ -1,61 +1,89 @@
-import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import SectionTitle from "../ui/SectionTitle";
-import Button from "../ui/Button";
+import { Link } from "react-router-dom";
+import { FaCircleCheck, FaArrowRight, FaPlay } from "react-icons/fa6";
 
-const AboutSection: React.FC = () => {
-  const features = [
-    "Pengalaman lebih dari 10 tahun",
-    "Tim profesional dan berpengalaman",
-    "Komitmen terhadap kualitas",
-    "Teknologi modern dan inovatif",
-  ];
-
+const AboutSection = () => {
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              alt="About Us"
-              className="rounded-lg shadow-xl"
-            />
-          </motion.div>
+    <section className="py-24 bg-[#F8FAFC]">
+      <div className="container mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* Text Content */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-[#F97316] font-bold uppercase tracking-wider text-sm mb-2">
+            About Us
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A] mb-6">
+            We Are A Trusted <br /> Construction Partner
+          </h2>
+          <p className="text-gray-500 leading-relaxed mb-6">
+            BuildCore is a construction company committed to delivering
+            innovative, sustainable, and high-quality solutions across various
+            industries.
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <ul className="space-y-3 mb-8 text-[#1E293B]">
+            <li className="flex items-center gap-3">
+              <FaCircleCheck className="text-[#F97316]" /> Experienced &
+              Professional Team
+            </li>
+            <li className="flex items-center gap-3">
+              <FaCircleCheck className="text-[#F97316]" /> Quality Work & Timely
+              Delivery
+            </li>
+            <li className="flex items-center gap-3">
+              <FaCircleCheck className="text-[#F97316]" /> Safety, Integrity &
+              Innovation
+            </li>
+            <li className="flex items-center gap-3">
+              <FaCircleCheck className="text-[#F97316]" /> Customer-Centric
+              Approach
+            </li>
+          </ul>
+
+          <Link
+            to="/about"
+            className="inline-flex items-center bg-[#F97316] text-white px-8 py-3.5 rounded-md font-semibold hover:bg-[#ea580c] transition-all shadow-lg hover:shadow-orange-200"
           >
-            <SectionTitle
-              title="Tentang Kami"
-              subtitle="Sekilas Perusahaan"
-              className="text-left"
+            Learn More About Us <FaArrowRight className="ml-2 w-4 h-4" />
+          </Link>
+        </motion.div>
+
+        {/* Image Content */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative"
+        >
+          <div className="relative rounded-xl overflow-hidden shadow-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1000&auto=format&fit=crop"
+              alt="About BuildCore"
+              className="w-full h-[400px] md:h-[500px] object-cover"
             />
-            <p className="text-gray-600 text-lg mb-6">
-              Kami adalah perusahaan konstruksi yang berdedikasi untuk
-              memberikan solusi infrastruktur terbaik dengan mengutamakan
-              kualitas, keamanan, dan kepuasan klien.
+            {/* Play Button Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <button className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-[#0F172A] hover:text-[#F97316] hover:scale-110 transition-all shadow-xl">
+                <FaPlay className="ml-1" />
+              </button>
+            </div>
+          </div>
+
+          {/* Floating Badge */}
+          <div className="absolute -bottom-6 -left-6 bg-[#0F172A] text-white p-6 rounded-xl shadow-xl min-w-[120px] min-h-[150px] hidden md:block">
+            <h4 className="text-4xl font-bold text-white">15+</h4>
+            <hr className="border-[#F97316] w-4 my-2"></hr>
+            <p className="text-xs text-gray-300 mt-1">
+              Years of <br /> Experience
             </p>
-            <ul className="space-y-3 mb-8">
-              {features.map((feature, index) => (
-                <li key={index} className="flex items-center space-x-3">
-                  <CheckCircleIcon className="h-6 w-6 text-blue-600" />
-                  <span className="text-gray-700">{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <Button variant="primary">Selengkapnya</Button>
-          </motion.div>
-        </div>
+            <hr className="border-[#F97316] w-4 mt-2"></hr>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

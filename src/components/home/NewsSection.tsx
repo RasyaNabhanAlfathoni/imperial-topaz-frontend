@@ -1,92 +1,83 @@
-import React from "react";
 import { motion } from "framer-motion";
-import { useNews } from "../../hooks/useNews";
-import SectionTitle from "../ui/SectionTitle";
-import Card from "../ui/Card";
-import Button from "../ui/Button";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
-import { ArrowRightIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa6";
 
-const NewsSection: React.FC = () => {
-  const { data: news, isLoading } = useNews();
+const newsData = [
+  {
+    date: "May 15, 2025",
+    title: "BuildCore Completes New Office Building Project",
+    desc: "We are proud to announce the successful completion of our latest office building...",
+    img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
+  },
+  {
+    date: "May 12, 2025",
+    title: "Construction Safety: Our Top Priority",
+    desc: "Ensuring the safety of our team and the public is our number one priority...",
+    img: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
+  },
+  {
+    date: "May 05, 2025",
+    title: "Sustainable Construction for A Better Future",
+    desc: "Our commitment to sustainable building practices continues to grow with new initiatives...",
+    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
+  },
+];
 
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4 text-center">
-          <div className="animate-pulse text-gray-400">Loading news...</div>
-        </div>
-      </section>
-    );
-  }
-
-  const displayedNews = news?.slice(0, 3) || [];
-
+const NewsSection = () => {
   return (
-    <section className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <SectionTitle title="Latest News & Insights" subtitle="Stay Updated" />
+    <section className="py-24 bg-[#F8FAFC]">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+          <div>
+            <p className="text-[#F97316] font-bold uppercase tracking-wider text-sm mb-2">
+              Latest News
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A]">
+              Latest News & Insights
+            </h2>
+          </div>
+          <Link
+            to="/news"
+            className="mt-4 md:mt-0 inline-flex items-center bg-white border border-gray-200 shadow-sm hover:shadow-md text-[#0F172A] px-6 py-3 rounded-md font-bold transition-all"
+          >
+            View All News <FaArrowRight className="ml-2 w-4 h-4" />
+          </Link>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {displayedNews.map((item, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {newsData.map((news, index) => (
             <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ y: -8 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all overflow-hidden group"
             >
-              <Card hover className="h-full">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={
-                      item.thumbnail ||
-                      "https://via.placeholder.com/400x250?text=News"
-                    }
-                    alt={item.judul}
-                    className="w-full h-48 object-cover transition-transform duration-500 hover:scale-110"
-                  />
-                  {item.is_featured && (
-                    <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      Featured
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
-                    <CalendarIcon className="h-4 w-4 mr-1 text-orange-500" />
-                    <span>
-                      {format(new Date(item.created_at), "MMM dd, yyyy", {
-                        locale: id,
-                      })}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-navy-600 mb-2 line-clamp-2">
-                    {item.judul}
-                  </h3>
-                  <div
-                    className="text-gray-600 text-sm mb-4 line-clamp-2"
-                    dangerouslySetInnerHTML={{
-                      __html: item.konten.substring(0, 100) + "...",
-                    }}
-                  />
-                  <Button variant="ghost" size="sm" className="group">
-                    Read More
-                    <ArrowRightIcon className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-              </Card>
+              <div className="h-48 overflow-hidden">
+                <img
+                  src={news.img}
+                  alt={news.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6">
+                <p className="text-xs text-gray-400 font-medium">{news.date}</p>
+                <h4 className="font-bold text-[#0F172A] text-lg my-2 group-hover:text-[#F97316] transition-colors">
+                  {news.title}
+                </h4>
+                <p className="text-sm text-gray-500 line-clamp-2 mb-4">
+                  {news.desc}
+                </p>
+                <Link
+                  to={`/news/${index}`}
+                  className="text-sm font-semibold text-[#0F172A] group-hover:gap-2 flex items-center transition-all"
+                >
+                  Read More <FaArrowRight className="ml-1 w-3 h-3" />
+                </Link>
+              </div>
             </motion.div>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Button variant="orange" size="lg">
-            View All News
-            <ArrowRightIcon className="ml-2 h-4 w-4" />
-          </Button>
         </div>
       </div>
     </section>
