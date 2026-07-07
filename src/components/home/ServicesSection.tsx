@@ -9,6 +9,7 @@ import {
   HomeIcon,
   WrenchScrewdriverIcon,
   DocumentIcon,
+  ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 
 const ServicesSection: React.FC = () => {
@@ -23,25 +24,25 @@ const ServicesSection: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-20">
         <div className="container mx-auto px-4 text-center">
-          <div className="animate-pulse">Loading services...</div>
+          <div className="animate-pulse text-gray-400">Loading services...</div>
         </div>
       </section>
     );
   }
 
-  const displayedServices = services?.slice(0, 6) || [];
+  const displayedServices = services?.slice(0, 3) || [];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <SectionTitle
-          title="Layanan Kami"
-          subtitle="Solusi Konstruksi Terbaik"
+          title="Our Services"
+          subtitle="Professional Construction Services"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {displayedServices.map((service, index) => {
             const Icon = iconMap[(index % 4) + 1] || WrenchScrewdriverIcon;
             return (
@@ -51,19 +52,19 @@ const ServicesSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
+                whileHover={{ y: -8 }}
               >
-                <Card hover className="h-full p-6">
-                  <div className="mb-4">
-                    <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon className="h-8 w-8 text-blue-600" />
-                    </div>
+                <Card hover className="h-full p-8 text-center group">
+                  <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-orange-500 transition-colors duration-300">
+                    <Icon className="h-8 w-8 text-orange-500 group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  <h3 className="text-xl font-semibold text-navy-600 mb-3">
                     {service.nama_services}
                   </h3>
                   <p className="text-gray-600 mb-4">{service.deskripsi}</p>
-                  <Button variant="ghost" size="sm">
-                    Selengkapnya →
+                  <Button variant="ghost" size="sm" className="group">
+                    Learn More
+                    <ArrowRightIcon className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Card>
               </motion.div>
@@ -72,8 +73,9 @@ const ServicesSection: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
-            Lihat Semua Layanan
+          <Button variant="orange" size="lg">
+            Explore Services
+            <ArrowRightIcon className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>

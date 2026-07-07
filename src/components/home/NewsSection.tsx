@@ -6,15 +6,16 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { ArrowRightIcon, CalendarIcon } from "@heroicons/react/24/outline";
 
 const NewsSection: React.FC = () => {
   const { data: news, isLoading } = useNews();
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4 text-center">
-          <div className="animate-pulse">Loading news...</div>
+          <div className="animate-pulse text-gray-400">Loading news...</div>
         </div>
       </section>
     );
@@ -23,14 +24,11 @@ const NewsSection: React.FC = () => {
   const displayedNews = news?.slice(0, 3) || [];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
-        <SectionTitle
-          title="Berita Terbaru"
-          subtitle="Update dan Informasi Terkini"
-        />
+        <SectionTitle title="Latest News & Insights" subtitle="Stay Updated" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {displayedNews.map((item, index) => (
             <motion.div
               key={item.id}
@@ -38,45 +36,45 @@ const NewsSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
+              whileHover={{ y: -8 }}
             >
-              <Card hover>
-                <div className="relative h-48 overflow-hidden">
+              <Card hover className="h-full">
+                <div className="relative overflow-hidden">
                   <img
-                    src={item.thumbnail || "/placeholder.jpg"}
+                    src={
+                      item.thumbnail ||
+                      "https://via.placeholder.com/400x250?text=News"
+                    }
                     alt={item.judul}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                    className="w-full h-48 object-cover transition-transform duration-500 hover:scale-110"
                   />
                   {item.is_featured && (
-                    <div className="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       Featured
                     </div>
                   )}
                 </div>
                 <div className="p-6">
                   <div className="flex items-center text-sm text-gray-500 mb-3">
+                    <CalendarIcon className="h-4 w-4 mr-1 text-orange-500" />
                     <span>
-                      {format(new Date(item.created_at), "dd MMMM yyyy", {
+                      {format(new Date(item.created_at), "MMM dd, yyyy", {
                         locale: id,
                       })}
                     </span>
-                    {item.kategori_berita && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <span className="text-blue-600">
-                          {item.kategori_berita.kategori_berita}
-                        </span>
-                      </>
-                    )}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
+                  <h3 className="text-lg font-semibold text-navy-600 mb-2 line-clamp-2">
                     {item.judul}
                   </h3>
                   <div
-                    className="text-gray-600 text-sm mb-4 line-clamp-3"
-                    dangerouslySetInnerHTML={{ __html: item.konten }}
+                    className="text-gray-600 text-sm mb-4 line-clamp-2"
+                    dangerouslySetInnerHTML={{
+                      __html: item.konten.substring(0, 100) + "...",
+                    }}
                   />
-                  <Button variant="ghost" size="sm">
-                    Baca Selengkapnya →
+                  <Button variant="ghost" size="sm" className="group">
+                    Read More
+                    <ArrowRightIcon className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
               </Card>
@@ -85,8 +83,9 @@ const NewsSection: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
-            Lihat Semua Berita
+          <Button variant="orange" size="lg">
+            View All News
+            <ArrowRightIcon className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>

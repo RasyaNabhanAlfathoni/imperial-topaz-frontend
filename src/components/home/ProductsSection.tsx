@@ -1,68 +1,42 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { useProducts, useProductCategories } from "../../hooks/useProducts";
+import { useProducts } from "../../hooks/useProducts";
 import SectionTitle from "../ui/SectionTitle";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
+import { ArrowRightIcon, CubeIcon } from "@heroicons/react/24/outline";
 
 const ProductsSection: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const { data: products, isLoading: isLoadingProducts } = useProducts();
-  const { data: categories, isLoading: isLoadingCategories } =
-    useProductCategories();
+  const { data: products, isLoading, error } = useProducts();
 
-  if (isLoadingProducts || isLoadingCategories) {
+  if (isLoading) {
     return (
-      <section className="py-16">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4 text-center">
-          <div className="animate-pulse">Loading products...</div>
+          <div className="animate-pulse text-gray-400">Loading products...</div>
         </div>
       </section>
     );
   }
 
-  const filteredProducts = selectedCategory
-    ? products?.filter((p) => p.id_kategori_produk === selectedCategory)
-    : products;
+  if (error) {
+    return (
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-red-500">Error loading products</p>
+        </div>
+      </section>
+    );
+  }
 
-  const displayedProducts = filteredProducts?.slice(0, 6) || [];
+  const displayedProducts = products?.slice(0, 3) || [];
 
   return (
-    <section className="py-16">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
-        <SectionTitle
-          title="Produk Unggulan"
-          subtitle="Produk Berkualitas Tinggi"
-        />
+        <SectionTitle title="Our Products" subtitle="High Quality Materials" />
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              selectedCategory === null
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Semua
-          </button>
-          {categories?.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedCategory === category.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {category.kategori_produk}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {displayedProducts.map((product, index) => (
             <motion.div
               key={product.id}
@@ -70,29 +44,37 @@ const ProductsSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
+              whileHover={{ y: -8 }}
             >
-              <Card hover>
-                <img
-                  src={product.foto1 || "/placeholder.jpg"}
-                  alt={product.nama_produk}
-                  className="w-full h-56 object-cover"
-                />
+              <Card hover className="h-full group">
+                <div className="relative overflow-hidden">
+                  <img
+                    src={
+                      product.foto1 ||
+                      "https://via.placeholder.com/400x300?text=Product"
+                    }
+                    alt={product.nama_produk}
+                    className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-600/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    New
+                  </div>
+                </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-navy-600 mb-2">
                     {product.nama_produk}
                   </h3>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {product.deskripsi}
+                    {product.deskripsi || "High quality construction materials"}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-blue-600">
-                      Rp {product.harga_per_pcs.toLocaleString("id-ID")}
+                    <span className="text-xl font-bold text-orange-500">
+                      Rp {product.harga_per_pcs?.toLocaleString("id-ID") || "0"}
                     </span>
-                    <span className="text-sm text-gray-500">/ pcs</span>
-                  </div>
-                  <div className="mt-4">
-                    <Button variant="outline" size="sm" className="w-full">
-                      Lihat Detail
+                    <Button variant="ghost" size="sm" className="group">
+                      Detail
+                      <ArrowRightIcon className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -102,8 +84,9 @@ const ProductsSection: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="primary" size="lg">
-            Lihat Semua Produk
+          <Button variant="orange" size="lg">
+            Explore Products
+            <ArrowRightIcon className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>

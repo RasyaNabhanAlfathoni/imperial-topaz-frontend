@@ -1,7 +1,8 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "orange";
   size?: "sm" | "md" | "lg";
   children: React.ReactNode;
   className?: string;
@@ -15,10 +16,12 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const variants = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700",
-    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50",
-    ghost: "text-blue-600 hover:bg-blue-50",
+    primary: "bg-navy-600 text-white hover:bg-navy-700",
+    secondary: "bg-slate-700 text-white hover:bg-slate-800",
+    orange:
+      "bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/30",
+    outline: "border-2 border-navy-600 text-navy-600 hover:bg-navy-50",
+    ghost: "text-navy-600 hover:bg-navy-50",
   };
 
   const sizes = {
@@ -28,12 +31,14 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className={`rounded-lg font-medium transition-all duration-200 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}
-    </button>
+    </motion.button>
   );
 };
 

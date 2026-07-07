@@ -7,10 +7,27 @@
 @layer base {
   html {
     font-family: "Inter", system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-white text-gray-900 antialiased;
+    @apply bg-background text-text antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-orange-500 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-orange-600;
   }
 }
 
@@ -27,5 +44,19 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
 }
