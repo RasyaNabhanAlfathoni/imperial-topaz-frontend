@@ -2,10 +2,10 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/Home/HomePage";
 import AboutPage from "../pages/About/AboutPage";
-// import ProductsPage from '../pages/Products/ProductsPage';
-// import ProductDetailPage from '../pages/Products/ProductDetailPage';
-// import ServicesPage from '../pages/Services/ServicesPage';
-// import ServiceDetailPage from '../pages/Services/ServiceDetailPage';
+import ProductsPage from "../pages/Products/ProductsPage";
+import ProductDetailPage from "../pages/Products/ProductDetailPage";
+import ServicesPage from "../pages/Services/ServicesPage";
+import ServiceDetailPage from "../pages/Services/ServiceDetailPage";
 // import ProjectsPage from '../pages/Projects/ProjectsPage';
 // import ProjectDetailPage from '../pages/Projects/ProjectDetailPage';
 // import PartnersPage from '../pages/Partners/PartnersPage';
@@ -26,22 +26,22 @@ const router = createBrowserRouter([
         path: "about",
         element: <AboutPage />,
       },
-      //   {
-      //     path: 'products',
-      //     element: <ProductsPage />,
-      //   },
-      //   {
-      //     path: 'products/:id',
-      //     element: <ProductDetailPage />,
-      //   },
-      //   {
-      //     path: 'services',
-      //     element: <ServicesPage />,
-      //   },
-      //   {
-      //     path: 'services/:id',
-      //     element: <ServiceDetailPage />,
-      //   },
+      {
+        path: "products",
+        element: <ProductsPage />,
+      },
+      {
+        path: "products/:id",
+        element: <ProductDetailPage />,
+      },
+      {
+        path: "services",
+        element: <ServicesPage />,
+      },
+      {
+        path: "services/:id",
+        element: <ServiceDetailPage />,
+      },
       //   {
       //     path: 'projects',
       //     element: <ProjectsPage />,
