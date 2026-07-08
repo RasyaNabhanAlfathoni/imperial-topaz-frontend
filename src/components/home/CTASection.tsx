@@ -4,7 +4,7 @@ import { FaArrowRight, FaHelmetSafety } from "react-icons/fa6";
 
 const CTASection = () => {
   return (
-    <section className="py-16 bg-[#0F172A] text-white relative overflow-hidden mx-10 mb-5 rounded-xl">
+    <section className="py-16 bg-[#0F172A] text-white relative overflow-hidden mx-14 mb-5 rounded-xl">
       {/* Background Pattern/Overlay (Opsional) */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] to-[#1E293B] opacity-90"></div>
 

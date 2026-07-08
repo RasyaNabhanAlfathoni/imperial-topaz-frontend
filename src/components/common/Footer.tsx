@@ -143,19 +143,6 @@ const Footer = () => {
               <li>📍 Jl. Raya Construction No. 88, Jakarta, Indonesia</li>
             </ul>
           </div>
-          <div>
-            <h4 className="font-semibold text-lg mb-3">Newsletter</h4>
-            <div className="relative">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="w-full bg-[#1E293B] text-white rounded-md px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-[#F97316]"
-              />
-              <button className="absolute right-1 top-1 bottom-1 bg-[#F97316] px-3 rounded-md hover:bg-[#ea580c] flex items-center justify-center">
-                <span className="text-white">→</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 

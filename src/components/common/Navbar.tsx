@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaChevronDown, FaBars, FaXmark } from "react-icons/fa6";
+import {
+  FaChevronDown,
+  FaBars,
+  FaXmark,
+  FaGears,
+  FaBox,
+} from "react-icons/fa6";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,8 +21,16 @@ const Navbar = () => {
       path: "#",
       dropdown: true,
       items: [
-        { name: "Our Products", path: "/products" },
-        { name: "Our Services", path: "/services" },
+        {
+          name: "Our Products",
+          path: "/products",
+          icon: <FaBox className="w-4 h-4" />,
+        },
+        {
+          name: "Our Services",
+          path: "/services",
+          icon: <FaGears className="w-4 h-4" />,
+        },
       ],
     },
     { name: "Projects", path: "/projects" },
@@ -72,8 +86,11 @@ const Navbar = () => {
                       <Link
                         key={item.name}
                         to={item.path}
-                        className="block px-4 py-3 hover:bg-[#0F172A] hover:text-[#F97316] transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 hover:text-[#F97316] transition-colors"
                       >
+                        <span className="text-[#F97316] group-hover:text-white transition-colors">
+                          {item.icon}
+                        </span>
                         {item.name}
                       </Link>
                     ))}
