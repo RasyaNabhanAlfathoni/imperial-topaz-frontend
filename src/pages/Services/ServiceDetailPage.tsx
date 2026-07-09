@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 
 // Import Swiper
@@ -9,92 +9,31 @@ import type { SwiperClass } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import "swiper/css/pagination"; // <--- Tambahkan ini
-import { Navigation, Thumbs, Autoplay, Pagination } from "swiper/modules"; // <--- Tambahkan Pagination
+import "swiper/css/pagination";
+import { Navigation, Thumbs, Autoplay, Pagination } from "swiper/modules";
 
 // Import Icons
 import { FaArrowRight } from "react-icons/fa6";
 
-// ==========================================
-// 1. DEFINISIKAN TYPE / INTERFACE
-// ==========================================
+// Import API dan types
+import { serviceAPI } from "../../api/service";
+import type { Service } from "../../types/service";
+import { getImageUrl } from "../../api/axios";
+
+// Placeholder image
+const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' font-family='system-ui' font-size='20' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+// Interface untuk service terkait
 interface RelatedService {
   id: number;
   nama_services: string;
   deskripsi: string;
-  foto1: string;
-}
-
-interface ServiceData {
-  id: number;
-  nama_services: string;
-  judul_deskripsi: string;
-  deskripsi: string;
-  konten: string;
-  foto1: string;
-  foto2: string;
-  foto3: string;
-  foto4: string;
-  foto5: string;
-  related_services?: RelatedService[];
+  foto1?: string;
 }
 
 // ==========================================
-// 2. DATA DUMMY SERVICE DETAIL
-// ==========================================
-const serviceData: ServiceData = {
-  id: 1,
-  nama_services: "Pre-Construction Planning",
-  judul_deskripsi: "Planning for Success. Building for the Future.",
-  deskripsi:
-    "Comprehensive planning and feasibility studies to lay a strong foundation for your construction project.",
-  konten: `
-    <p>Kami melakukan studi kelayakan, analisis lokasi, estimasi biaya, penyusunan jadwal, identifikasi risiko, hingga pengurusan izin yang diperlukan.</p>
-    <p>Dengan perencanaan yang tepat, kami memastikan proyek Anda berjalan lebih efisien, tepat waktu, dan sesuai anggaran.</p>
-  `,
-  foto1: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
-  foto2:
-    "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  foto3:
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-  foto4:
-    "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  foto5:
-    "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  related_services: [
-    {
-      id: 2,
-      nama_services: "Design & Build",
-      deskripsi: "Solusi terintegrasi dari konsep hingga konstruksi.",
-      foto1:
-        "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    },
-    {
-      id: 3,
-      nama_services: "Project Management",
-      deskripsi: "Manajemen proyek profesional dan terstruktur.",
-      foto1:
-        "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    },
-    {
-      id: 4,
-      nama_services: "General Construction",
-      deskripsi: "Pembangunan umum berkualitas tinggi.",
-      foto1:
-        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    },
-    {
-      id: 5,
-      nama_services: "Consulting",
-      deskripsi: "Konsultasi ahli untuk solusi konstruksi terbaik.",
-      foto1:
-        "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-    },
-  ],
-};
-
-// ==========================================
-// 3. KOMPONEN - KOMPONEN
+// KOMPONEN - KOMPONEN
 // ==========================================
 
 // --- KOMPONEN BREADCRUMB ---
@@ -124,6 +63,11 @@ interface ServiceGalleryProps {
 const ServiceGallery = ({ images }: ServiceGalleryProps) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
 
+  // Filter gambar yang valid
+  const validImages = images.filter((img) => img && img.trim() !== "");
+  const galleryImages =
+    validImages.length > 0 ? validImages : [PLACEHOLDER_IMAGE];
+
   return (
     <div className="space-y-4">
       <Swiper
@@ -136,45 +80,53 @@ const ServiceGallery = ({ images }: ServiceGalleryProps) => {
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         className="rounded-2xl overflow-hidden shadow-sm h-[350px] md:h-[450px]"
       >
-        {images.map((img, index) => (
+        {galleryImages.map((img, index) => (
           <SwiperSlide key={index}>
             <img
-              src={img}
+              src={img.startsWith("http") ? img : getImageUrl(img)}
               alt={`Gallery ${index}`}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+              }}
             />
           </SwiperSlide>
         ))}
       </Swiper>
 
-      <Swiper
-        onSwiper={setThumbsSwiper}
-        spaceBetween={12}
-        slidesPerView={4}
-        freeMode={true}
-        watchSlidesProgress={true}
-        modules={[Navigation, Thumbs]}
-        className="thumb-slider h-20 md:h-24"
-      >
-        {images.map((img, index) => (
-          <SwiperSlide key={index}>
-            <button className="w-full h-full rounded-lg overflow-hidden border-2 border-transparent hover:border-[#F97316] transition-all">
-              <img
-                src={img}
-                alt={`Thumb ${index}`}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      {galleryImages.length > 1 && (
+        <Swiper
+          onSwiper={setThumbsSwiper}
+          spaceBetween={12}
+          slidesPerView={Math.min(4, galleryImages.length)}
+          freeMode={true}
+          watchSlidesProgress={true}
+          modules={[Navigation, Thumbs]}
+          className="thumb-slider h-20 md:h-24"
+        >
+          {galleryImages.map((img, index) => (
+            <SwiperSlide key={index}>
+              <button className="w-full h-full rounded-lg overflow-hidden border-2 border-transparent hover:border-[#F97316] transition-all">
+                <img
+                  src={img.startsWith("http") ? img : getImageUrl(img)}
+                  alt={`Thumb ${index}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                  }}
+                />
+              </button>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
     </div>
   );
 };
 
 // --- KOMPONEN INFO LAYANAN (Kanan) ---
 interface ServiceInfoProps {
-  service: ServiceData;
+  service: Service;
 }
 
 const ServiceInfo = ({ service }: ServiceInfoProps) => {
@@ -185,9 +137,11 @@ const ServiceInfo = ({ service }: ServiceInfoProps) => {
       transition={{ duration: 0.6, delay: 0.2 }}
       className="space-y-6"
     >
-      <p className="text-[#F97316] font-semibold text-sm">
-        {service.judul_deskripsi}
-      </p>
+      {service.judul_deskripsi && (
+        <p className="text-[#F97316] font-semibold text-sm">
+          {service.judul_deskripsi}
+        </p>
+      )}
 
       <h1 className="text-3xl md:text-4xl font-bold text-[#0F172A] leading-tight">
         {service.nama_services}
@@ -200,12 +154,16 @@ const ServiceInfo = ({ service }: ServiceInfoProps) => {
   );
 };
 
-// --- KOMPONEN LAYANAN TERKAIT (SEKARANG MENJADI SLIDER) ---
+// --- KOMPONEN LAYANAN TERKAIT ---
 interface RelatedServicesProps {
   services: RelatedService[];
 }
 
 const RelatedServices = ({ services }: RelatedServicesProps) => {
+  if (!services || services.length === 0) {
+    return null;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -232,35 +190,46 @@ const RelatedServices = ({ services }: RelatedServicesProps) => {
           }}
           className="pb-12 md:pb-0"
         >
-          {services.map((service) => (
-            <SwiperSlide key={service.id}>
-              <motion.div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
-                <div className="h-40 overflow-hidden">
-                  <img
-                    src={service.foto1}
-                    alt={service.nama_services}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-5 flex-grow flex flex-col">
-                  <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors">
-                    {service.nama_services}
-                  </h4>
-                  <p className="text-gray-500 text-xs mb-3 line-clamp-2 flex-grow">
-                    {service.deskripsi}
-                  </p>
-                  <div className="flex justify-end items-center mt-2 pt-3 border-t border-gray-50">
-                    <Link
-                      to={`/services/${service.id}`}
-                      className="text-[#F97316] text-sm font-medium hover:translate-x-1 transition-transform flex items-center gap-1"
-                    >
-                      Lihat Detail <FaArrowRight className="w-3 h-3" />
-                    </Link>
+          {services.map((service) => {
+            const imageUrl = service.foto1
+              ? service.foto1.startsWith("http")
+                ? service.foto1
+                : getImageUrl(service.foto1)
+              : PLACEHOLDER_IMAGE;
+
+            return (
+              <SwiperSlide key={service.id}>
+                <motion.div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
+                  <div className="h-40 overflow-hidden bg-gray-100">
+                    <img
+                      src={imageUrl}
+                      alt={service.nama_services}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                      }}
+                    />
                   </div>
-                </div>
-              </motion.div>
-            </SwiperSlide>
-          ))}
+                  <div className="p-5 flex-grow flex flex-col">
+                    <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors line-clamp-2">
+                      {service.nama_services}
+                    </h4>
+                    <p className="text-gray-500 text-xs mb-3 line-clamp-2 flex-grow">
+                      {service.deskripsi}
+                    </p>
+                    <div className="flex justify-end items-center mt-2 pt-3 border-t border-gray-50">
+                      <Link
+                        to={`/services/${service.id}`}
+                        className="text-[#F97316] text-sm font-medium hover:translate-x-1 transition-transform flex items-center gap-1"
+                      >
+                        Lihat Detail <FaArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       </div>
     </motion.div>
@@ -268,37 +237,167 @@ const RelatedServices = ({ services }: RelatedServicesProps) => {
 };
 
 // ==========================================
-// 4. HALAMAN UTAMA SERVICE DETAIL
+// HALAMAN UTAMA SERVICE DETAIL
 // ==========================================
 const ServiceDetailPage = () => {
-  const galleryImages = [
-    serviceData.foto1,
-    serviceData.foto2,
-    serviceData.foto3,
-    serviceData.foto4,
-    serviceData.foto5,
-  ].filter(Boolean);
+  const { id } = useParams<{ id: string }>();
+  const [service, setService] = useState<Service | null>(null);
+  const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  return (
-    <>
+  // Fungsi untuk mengambil data service detail
+  const fetchServiceDetail = async () => {
+    if (!id) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Ambil data service detail
+      const serviceData = await serviceAPI.getById(parseInt(id));
+      console.log("Service Data:", serviceData);
+
+      if (!serviceData || !serviceData.id) {
+        throw new Error("Service data is empty or invalid");
+      }
+
+      setService(serviceData);
+
+      // Ambil semua service untuk service terkait
+      try {
+        const allServices = await serviceAPI.getAll();
+        console.log("All Services:", allServices);
+
+        if (
+          allServices &&
+          Array.isArray(allServices) &&
+          allServices.length > 0
+        ) {
+          // Filter service terkait (service lain yang bukan service ini)
+          const related = allServices
+            .filter((s: Service) => s.id !== serviceData.id)
+            .slice(0, 4)
+            .map((s: Service) => ({
+              id: s.id,
+              nama_services: s.nama_services,
+              deskripsi: s.deskripsi || s.judul_deskripsi || "",
+              foto1: s.foto1 || s.foto2 || s.foto3 || s.foto4 || s.foto5 || "",
+            }));
+
+          setRelatedServices(related);
+        }
+      } catch (relatedErr) {
+        console.warn("Failed to fetch related services:", relatedErr);
+      }
+    } catch (err) {
+      console.error("Error fetching service detail:", err);
+      setError("Gagal mengambil detail layanan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchServiceDetail();
+  }, [id]);
+
+  // Fungsi untuk mendapatkan daftar gambar
+  const getGalleryImages = (service: Service): string[] => {
+    const images = [
+      service.foto1,
+      service.foto2,
+      service.foto3,
+      service.foto4,
+      service.foto5,
+    ].filter(
+      (img): img is string =>
+        img !== undefined && img !== null && img.trim() !== "",
+    );
+
+    return images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+  };
+
+  // Fungsi untuk mendapatkan gambar utama
+  const getMainImage = (service: Service): string => {
+    const foto =
+      service.foto1 ||
+      service.foto2 ||
+      service.foto3 ||
+      service.foto4 ||
+      service.foto5;
+    return foto
+      ? foto.startsWith("http")
+        ? foto
+        : getImageUrl(foto)
+      : PLACEHOLDER_IMAGE;
+  };
+
+  // Loading state
+  if (loading) {
+    return (
       <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
         <div className="container mx-auto px-4 md:px-8 max-w-6xl">
-          <Breadcrumb title={serviceData.nama_services} />
-
-          {/* Bagian Atas: Gallery & Info */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <ServiceGallery images={galleryImages} />
-            </motion.div>
-
-            <ServiceInfo service={serviceData} />
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Memuat detail layanan...</p>
+            </div>
           </div>
+        </div>
+      </section>
+    );
+  }
 
-          {/* Bagian Tengah: Project Planning & Feasibility */}
+  // Error state
+  if (error || !service) {
+    return (
+      <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
+        <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <p className="text-red-500 text-lg mb-4">
+              {error || "Layanan tidak ditemukan"}
+            </p>
+            <button
+              onClick={fetchServiceDetail}
+              className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+            >
+              Coba Lagi
+            </button>
+            <Link
+              to="/services"
+              className="mt-4 text-[#F97316] hover:underline"
+            >
+              Kembali ke Layanan
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const galleryImages = getGalleryImages(service);
+
+  return (
+    <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
+      <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+        <Breadcrumb title={service.nama_services} />
+
+        {/* Bagian Atas: Gallery & Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <ServiceGallery images={galleryImages} />
+          </motion.div>
+
+          <ServiceInfo service={service} />
+        </div>
+
+        {/* Bagian Tengah: Detail Konten */}
+        {service.konten && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 mt-16">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -306,11 +405,14 @@ const ServiceDetailPage = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <div className="rounded-2xl overflow-hidden shadow-sm h-[350px] md:h-[450px]">
+              <div className="rounded-2xl overflow-hidden shadow-sm h-[350px] md:h-[450px] bg-gray-100">
                 <img
-                  src={serviceData.foto1}
-                  alt="Project Planning"
+                  src={getMainImage(service)}
+                  alt={service.nama_services}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                  }}
                 />
               </div>
             </motion.div>
@@ -321,27 +423,39 @@ const ServiceDetailPage = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <p className="text-[#F97316] font-bold uppercase tracking-wider text-sm mb-2">
-                {serviceData.nama_services}
-              </p>
+              {service.judul_deskripsi && (
+                <p className="text-[#F97316] font-bold uppercase tracking-wider text-sm mb-2">
+                  {service.nama_services}
+                </p>
+              )}
               <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A] mb-4 leading-tight">
-                {serviceData.judul_deskripsi}
+                {service.judul_deskripsi || service.nama_services}
               </h2>
               <div
-                className="text-gray-500 leading-relaxed prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: serviceData.konten }}
+                className="text-gray-500 leading-relaxed prose prose-sm max-w-none prose-headings:text-[#0F172A] prose-a:text-[#F97316]"
+                dangerouslySetInnerHTML={{ __html: service.konten }}
               />
             </motion.div>
           </div>
+        )}
 
-          {/* Bagian Layanan Terkait (Sekarang Slider) */}
-          {serviceData.related_services &&
-            serviceData.related_services.length > 0 && (
-              <RelatedServices services={serviceData.related_services} />
-            )}
+        {/* Bagian Layanan Terkait */}
+        {relatedServices.length > 0 && (
+          <RelatedServices services={relatedServices} />
+        )}
+
+        {/* Tombol Kembali */}
+        <div className="mt-12 text-center">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 text-[#0F172A] hover:text-[#F97316] transition-colors font-medium"
+          >
+            <FaArrowRight className="rotate-180" />
+            Kembali ke Semua Layanan
+          </Link>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

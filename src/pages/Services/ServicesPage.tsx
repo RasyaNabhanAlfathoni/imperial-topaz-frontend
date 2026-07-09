@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import MainLayout from "../../layouts/MainLayout";
 
@@ -7,61 +8,79 @@ import ServiceCard from "../../components/services/ServiceCard";
 import ServicesCtaBanner from "../../components/services/ServicesCtaBanner";
 import ServicesStats from "../../components/services/ServicesStats";
 
-// --- DATA DUMMY LAYANAN ---
-// Di proyek nyata, data ini akan diambil dari API `useServices()`
-// Gambar di sini saya ganti dengan foto konstruksi dari Unsplash sesuai permintaan Anda untuk menggantikan logo
-const servicesData = [
-  {
-    id: 1,
-    title: "Pre-Construction",
-    desc: "Planning, budgeting, feasibility studies, and design support to set your project up for success.",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  },
-  {
-    id: 2,
-    title: "General Construction",
-    desc: "Full-service construction for commercial, industrial, and residential projects.",
-    img: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-  {
-    id: 3,
-    title: "Project Management",
-    desc: "End-to-end project management ensuring quality, budget, and timeline are met.",
-    img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-  },
-  {
-    id: 4,
-    title: "Design & Build",
-    desc: "Integrated solutions from concept to construction under one roof.",
-    img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  },
-  {
-    id: 5,
-    title: "Renovation",
-    desc: "Transforming existing structures with quality renovation services.",
-    img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-  },
-  {
-    id: 6,
-    title: "Structural Works",
-    desc: "Strong and safe structures built with engineering excellence.",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  },
-  {
-    id: 7,
-    title: "MEP Installation",
-    desc: "Mechanical, electrical, and plumbing systems installed with precision.",
-    img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-  },
-  {
-    id: 8,
-    title: "Consulting",
-    desc: "Expert consultation to help you make informed decisions for your projects.",
-    img: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-];
+// Import API dan types
+import { serviceAPI } from "../../api/service";
+import type { Service } from "../../types/service";
 
 const ServicesPage = () => {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fungsi untuk mengambil data dari API
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await serviceAPI.getAll();
+
+      // Pastikan data adalah array
+      const servicesList = Array.isArray(data) ? data : [];
+      setServices(servicesList);
+    } catch (err) {
+      console.error("Error fetching services:", err);
+      setError("Gagal mengambil data layanan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Ambil data saat komponen pertama kali di-render
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <>
+        <ServicesHero />
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">Memuat data layanan...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <>
+        <ServicesHero />
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+              <p className="text-red-500 text-lg mb-4">{error}</p>
+              <button
+                onClick={fetchServices}
+                className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
       <ServicesHero />
@@ -85,12 +104,18 @@ const ServicesPage = () => {
             <div className="w-12 h-1 bg-[#F97316] mt-3 rounded-full"></div>
           </motion.div>
 
-          {/* Grid Layanan (8 Kartu) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {servicesData.map((service, index) => (
-              <ServiceCard key={service.id} service={service} index={index} />
-            ))}
-          </div>
+          {/* Grid Layanan */}
+          {services.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              Belum ada data layanan.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {services.map((service, index) => (
+                <ServiceCard key={service.id} service={service} index={index} />
+              ))}
+            </div>
+          )}
 
           {/* CTA Banner */}
           <ServicesCtaBanner />
