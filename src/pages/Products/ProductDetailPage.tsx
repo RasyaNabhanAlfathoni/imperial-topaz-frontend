@@ -5,11 +5,12 @@ import MainLayout from "../../layouts/MainLayout";
 
 // Import Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
-import type { SwiperClass } from "swiper/react"; //
+import type { SwiperClass } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import { Navigation, Thumbs, Autoplay } from "swiper/modules";
+import "swiper/css/pagination"; // <--- Tambahkan ini
+import { Navigation, Thumbs, Autoplay, Pagination } from "swiper/modules"; // <--- Tambahkan Pagination
 
 // Import Icons
 import {
@@ -135,7 +136,6 @@ interface ProductGalleryProps {
 }
 
 const ProductGallery = ({ images }: ProductGalleryProps) => {
-  // Gunakan SwiperClass | null
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
 
   return (
@@ -294,7 +294,7 @@ const SpecsAndAdvantages = ({ product }: SpecsAndAdvantagesProps) => {
   );
 };
 
-// --- KOMPONEN PRODUK TERKAIT ---
+// --- KOMPONEN PRODUK TERKAIT (SEKARANG MENJADI SLIDER) ---
 interface RelatedProductsProps {
   products: RelatedProduct[];
 }
@@ -311,45 +311,57 @@ const RelatedProducts = ({ products }: RelatedProductsProps) => {
       <h3 className="text-xl md:text-2xl font-bold text-[#0F172A] mb-6">
         Produk Terkait
       </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((product, index) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
-          >
-            <div className="h-40 overflow-hidden">
-              <img
-                src={product.img}
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-5">
-              <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors">
-                {product.name}
-              </h4>
-              <p className="text-[#F97316] font-bold text-sm mb-2">
-                Rp {product.price.toLocaleString("id-ID")}{" "}
-                <span className="font-normal text-gray-400 text-xs">/ pcs</span>
-              </p>
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
-                <span className="text-xs text-gray-400">
-                  {product.category}
-                </span>
-                <Link
-                  to={`/products/${product.id}`}
-                  className="text-[#F97316] hover:translate-x-1 transition-transform"
-                >
-                  <FaArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+
+      <div className="relative px-4 md:px-0">
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]}
+          spaceBetween={24}
+          slidesPerView={1}
+          navigation={true}
+          pagination={{ clickable: true, dynamicBullets: true }}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          breakpoints={{
+            640: { slidesPerView: 2, spaceBetween: 20 },
+            1024: { slidesPerView: 4, spaceBetween: 24 },
+          }}
+          className="pb-12 md:pb-0"
+        >
+          {products.map((product) => (
+            <SwiperSlide key={product.id}>
+              <motion.div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
+                <div className="h-40 overflow-hidden">
+                  <img
+                    src={product.img}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5 flex-grow flex flex-col">
+                  <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors">
+                    {product.name}
+                  </h4>
+                  <p className="text-[#F97316] font-bold text-sm mb-2">
+                    Rp {product.price.toLocaleString("id-ID")}{" "}
+                    <span className="font-normal text-gray-400 text-xs">
+                      / pcs
+                    </span>
+                  </p>
+                  <div className="mt-2 pt-3 border-t border-gray-50 flex justify-between items-center">
+                    <span className="text-xs text-gray-400">
+                      {product.category}
+                    </span>
+                    <Link
+                      to={`/products/${product.id}`}
+                      className="text-[#F97316] hover:translate-x-1 transition-transform"
+                    >
+                      <FaArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
     </motion.div>
   );

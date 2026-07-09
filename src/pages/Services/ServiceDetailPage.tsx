@@ -9,7 +9,8 @@ import type { SwiperClass } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
-import { Navigation, Thumbs, Autoplay } from "swiper/modules";
+import "swiper/css/pagination"; // <--- Tambahkan ini
+import { Navigation, Thumbs, Autoplay, Pagination } from "swiper/modules"; // <--- Tambahkan Pagination
 
 // Import Icons
 import { FaArrowRight } from "react-icons/fa6";
@@ -199,7 +200,7 @@ const ServiceInfo = ({ service }: ServiceInfoProps) => {
   );
 };
 
-// --- KOMPONEN LAYANAN TERKAIT ---
+// --- KOMPONEN LAYANAN TERKAIT (SEKARANG MENJADI SLIDER) ---
 interface RelatedServicesProps {
   services: RelatedService[];
 }
@@ -217,41 +218,50 @@ const RelatedServices = ({ services }: RelatedServicesProps) => {
         Layanan Terkait
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {services.map((service, index) => (
-          <motion.div
-            key={service.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
-          >
-            <div className="h-40 overflow-hidden">
-              <img
-                src={service.foto1}
-                alt={service.nama_services}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-5">
-              <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors">
-                {service.nama_services}
-              </h4>
-              <p className="text-gray-500 text-xs mb-3 line-clamp-2">
-                {service.deskripsi}
-              </p>
-              <div className="flex justify-end items-center mt-2 pt-3 border-t border-gray-50">
-                <Link
-                  to={`/services/${service.id}`}
-                  className="text-[#F97316] text-sm font-medium hover:translate-x-1 transition-transform flex items-center gap-1"
-                >
-                  Lihat Detail <FaArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+      <div className="relative px-4 md:px-0">
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]}
+          spaceBetween={24}
+          slidesPerView={1}
+          navigation={true}
+          pagination={{ clickable: true, dynamicBullets: true }}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          breakpoints={{
+            640: { slidesPerView: 2, spaceBetween: 20 },
+            1024: { slidesPerView: 4, spaceBetween: 24 },
+          }}
+          className="pb-12 md:pb-0"
+        >
+          {services.map((service) => (
+            <SwiperSlide key={service.id}>
+              <motion.div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
+                <div className="h-40 overflow-hidden">
+                  <img
+                    src={service.foto1}
+                    alt={service.nama_services}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5 flex-grow flex flex-col">
+                  <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors">
+                    {service.nama_services}
+                  </h4>
+                  <p className="text-gray-500 text-xs mb-3 line-clamp-2 flex-grow">
+                    {service.deskripsi}
+                  </p>
+                  <div className="flex justify-end items-center mt-2 pt-3 border-t border-gray-50">
+                    <Link
+                      to={`/services/${service.id}`}
+                      className="text-[#F97316] text-sm font-medium hover:translate-x-1 transition-transform flex items-center gap-1"
+                    >
+                      Lihat Detail <FaArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
     </motion.div>
   );
@@ -324,7 +334,7 @@ const ServiceDetailPage = () => {
             </motion.div>
           </div>
 
-          {/* Bagian Layanan Terkait */}
+          {/* Bagian Layanan Terkait (Sekarang Slider) */}
           {serviceData.related_services &&
             serviceData.related_services.length > 0 && (
               <RelatedServices services={serviceData.related_services} />

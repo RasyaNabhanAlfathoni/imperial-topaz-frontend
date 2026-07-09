@@ -50,7 +50,7 @@ const Navbar = () => {
       ],
     },
     { name: "Projects", path: "/projects" },
-    { name: "Contact Us", path: "/contact" },
+    { name: "News", path: "/news" },
   ];
 
   // Fungsi untuk cek apakah link aktif

@@ -6,9 +6,8 @@ import ProductsPage from "../pages/Products/ProductsPage";
 import ProductDetailPage from "../pages/Products/ProductDetailPage";
 import ServicesPage from "../pages/Services/ServicesPage";
 import ServiceDetailPage from "../pages/Services/ServiceDetailPage";
-// import ProjectsPage from '../pages/Projects/ProjectsPage';
-// import ProjectDetailPage from '../pages/Projects/ProjectDetailPage';
-// import PartnersPage from '../pages/Partners/PartnersPage';
+import ProjectsPage from "../pages/Projects/ProjectsPage";
+import ProjectDetailPage from "../pages/Projects/ProjectDetailPage";
 // import NewsPage from '../pages/News/NewsPage';
 // import NewsDetailPage from '../pages/News/NewsDetailPage';
 // import ContactPage from '../pages/Contact/ContactPage';
@@ -42,14 +41,14 @@ const router = createBrowserRouter([
         path: "services/:id",
         element: <ServiceDetailPage />,
       },
-      //   {
-      //     path: 'projects',
-      //     element: <ProjectsPage />,
-      //   },
-      //   {
-      //     path: 'projects/:id',
-      //     element: <ProjectDetailPage />,
-      //   },
+      {
+        path: "projects",
+        element: <ProjectsPage />,
+      },
+      {
+        path: "projects/:id",
+        element: <ProjectDetailPage />,
+      },
       //   {
       //     path: 'partners',
       //     element: <PartnersPage />,
