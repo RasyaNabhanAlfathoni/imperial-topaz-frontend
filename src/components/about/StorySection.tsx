@@ -70,7 +70,7 @@ const StorySection = () => {
 
           {/* Floating Badge */}
           <div className="absolute -right-4 md:-right-8 top-1/2 -translate-y-1/2 bg-[#0F172A] text-white p-6 rounded-xl shadow-2xl hidden md:flex flex-col items-start max-w-[180px]">
-            <h4 className="text-4xl font-bold text-[#F97316]">15+</h4>
+            <h4 className="text-4xl font-bold text-[#F97316]">10+</h4>
             <p className="text-sm text-gray-300 leading-tight mb-2">
               Years Of Experience
             </p>
