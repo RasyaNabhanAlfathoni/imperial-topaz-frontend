@@ -101,7 +101,7 @@ const AboutSection = () => {
 
           {/* Floating Badge */}
           <div className="absolute -bottom-6 -left-6 bg-[#0F172A] text-white p-6 rounded-xl shadow-xl min-w-[120px] min-h-[150px]">
-            <h4 className="text-4xl font-bold text-[#F97316]">15+</h4>
+            <h4 className="text-4xl font-bold text-[#F97316]">10+</h4>
             <hr className="border-white/20 w-6 my-2"></hr>
             <p className="text-xs text-gray-300 mt-1 font-medium leading-tight">
               Years of <br /> Experience
