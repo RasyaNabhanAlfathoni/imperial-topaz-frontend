@@ -8,8 +8,8 @@ import ServicesPage from "../pages/Services/ServicesPage";
 import ServiceDetailPage from "../pages/Services/ServiceDetailPage";
 import ProjectsPage from "../pages/Projects/ProjectsPage";
 import ProjectDetailPage from "../pages/Projects/ProjectDetailPage";
-// import NewsPage from '../pages/News/NewsPage';
-// import NewsDetailPage from '../pages/News/NewsDetailPage';
+import NewsPage from "../pages/News/NewsPage";
+import NewsDetailPage from "../pages/News/NewsDetailPage";
 // import ContactPage from '../pages/Contact/ContactPage';
 
 const router = createBrowserRouter([
@@ -53,14 +53,14 @@ const router = createBrowserRouter([
       //     path: 'partners',
       //     element: <PartnersPage />,
       //   },
-      //   {
-      //     path: 'news',
-      //     element: <NewsPage />,
-      //   },
-      //   {
-      //     path: 'news/:slug',
-      //     element: <NewsDetailPage />,
-      //   },
+      {
+        path: "news",
+        element: <NewsPage />,
+      },
+      {
+        path: "news/:slug",
+        element: <NewsDetailPage />,
+      },
       //   {
       //     path: 'contact',
       //     element: <ContactPage />,
