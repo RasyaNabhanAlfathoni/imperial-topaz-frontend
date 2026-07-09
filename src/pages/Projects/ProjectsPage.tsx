@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa6";
 import MainLayout from "../../layouts/MainLayout";
@@ -14,193 +14,98 @@ import ProjectsHero from "../../components/projects/ProjectsHero";
 import ProjectCard from "../../components/projects/ProjectCard";
 import ProjectsPartners from "../../components/projects/ProjectsPartners";
 
-// ==========================================
-// 1. DATA DUMMY PROYEK
-// ==========================================
-const projectsData = [
-  {
-    id: 1,
-    nama_proyek: "Office Building Jakarta",
-    lokasi: "Jakarta, Indonesia",
-    tahun: "2024",
-    deskripsi: "Modern office building with sustainable design.",
-    client: "PT. Corporate Indonesia",
-    kategori: "Commercial",
-    foto1:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
-    foto2:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    foto3:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    foto4:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-    foto5:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  },
-  {
-    id: 2,
-    nama_proyek: "Green Villa Residence",
-    lokasi: "Bandung, Indonesia",
-    tahun: "2023",
-    deskripsi: "Eco-friendly residential complex with green spaces.",
-    client: "PT. Alam Lestari",
-    kategori: "Residential",
-    foto1:
-      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",
-    foto2:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    foto3:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    foto4:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    foto5:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-  {
-    id: 3,
-    nama_proyek: "Cikampek Toll Road Section 2",
-    lokasi: "West Java, Indonesia",
-    tahun: "2024",
-    deskripsi: "Major infrastructure project connecting cities.",
-    client: "PT. Jasa Marga",
-    kategori: "Infrastructure",
-    foto1:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&q=80",
-    foto2:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    foto3:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    foto4:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    foto5:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-  {
-    id: 4,
-    nama_proyek: "Logistics Warehouse",
-    lokasi: "Surabaya, Indonesia",
-    tahun: "2023",
-    deskripsi: "Large-scale warehouse with modern facilities.",
-    client: "PT. Logistik Nusantara",
-    kategori: "Industrial",
-    foto1:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-    foto2:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    foto3:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    foto4:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    foto5:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-  {
-    id: 5,
-    nama_proyek: "University Building",
-    lokasi: "Yogyakarta, Indonesia",
-    tahun: "2022",
-    deskripsi: "Educational facility with modern lecture halls.",
-    client: "PT. Pendidikan Maju",
-    kategori: "Institutional",
-    foto1:
-      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80",
-    foto2:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    foto3:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    foto4:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    foto5:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-  {
-    id: 6,
-    nama_proyek: "River Bridge Project",
-    lokasi: "Central Java, Indonesia",
-    tahun: "2022",
-    deskripsi: "Strategic bridge connecting two major regions.",
-    client: "PT. Pembangunan Jaya",
-    kategori: "Infrastructure",
-    foto1:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    foto2:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    foto3:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    foto4:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-    foto5:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  },
-];
+// Import API dan types
+import { projectAPI } from "../../api/project";
+import { partnerAPI } from "../../api/partner";
+import type { Project } from "../../types/project";
+import type { Partner } from "../../types/partner";
 
 // ==========================================
-// 2. DATA DUMMY MITRA
-// ==========================================
-const partnersData = [
-  {
-    id: 1,
-    nama_perusahaan: "PT Waskita Karya",
-    deskripsi: "Leading infrastructure and construction company in Indonesia.",
-    logo_perusahaan:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Adhi_Karya_logo.svg/2560px-Adhi_Karya_logo.svg.png",
-    website: "https://www.waskita.co.id/",
-  },
-  {
-    id: 2,
-    nama_perusahaan: "PT PP (Persero) Tbk",
-    deskripsi: "Construction & investment company with a strong track record.",
-    logo_perusahaan:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/PP_Logo.svg/2560px-PP_Logo.svg.png",
-    website: "https://www.pp.co.id/",
-  },
-  {
-    id: 3,
-    nama_perusahaan: "PT Jaya Konstruksi",
-    deskripsi:
-      "Experienced in building various construction projects nationwide.",
-    logo_perusahaan:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Jasa_Marga_logo.svg/2560px-Jasa_Marga_logo.svg.png",
-    website: "https://www.jayakonstruksi.co.id/",
-  },
-  {
-    id: 4,
-    nama_perusahaan: "PT Total Bangun Persada Tbk",
-    deskripsi: "Building innovative solutions for a better future.",
-    logo_perusahaan:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/TotalEnergies_logo.svg/2560px-TotalEnergies_logo.svg.png",
-    website: "https://www.totalbp.com/",
-  },
-  {
-    id: 5,
-    nama_perusahaan: "PT Nindya Karya",
-    deskripsi: "Trusted partner in engineering and construction services.",
-    logo_perusahaan:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/MIND_ID_logo.svg/2560px-MIND_ID_logo.svg.png",
-    website: "https://www.nindyakarya.co.id/",
-  },
-  {
-    id: 6,
-    nama_perusahaan: "PT Adhi Karya (Persero) Tbk",
-    deskripsi: "Committed to delivering quality and sustainable construction.",
-    logo_perusahaan:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Adhi_Karya_logo.svg/2560px-Adhi_Karya_logo.svg.png",
-    website: "https://www.adhi.co.id/",
-  },
-];
-
-// ==========================================
-// 3. HALAMAN UTAMA PROJECTS
+// HALAMAN UTAMA PROJECTS
 // ==========================================
 const ProjectsPage = () => {
-  const [visibleCount, setVisibleCount] = useState(6); // Tampilkan 6 proyek awal
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(6);
 
-  const visibleProjects = projectsData.slice(0, visibleCount);
-  const hasMoreProjects = visibleCount < projectsData.length;
+  // Fungsi untuk mengambil data
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Ambil data proyek dan partner secara paralel
+      const [projectsData, partnersData] = await Promise.all([
+        projectAPI.getAll(),
+        partnerAPI.getAll(),
+      ]);
+
+      const projectsList = Array.isArray(projectsData) ? projectsData : [];
+      const partnersList = Array.isArray(partnersData) ? partnersData : [];
+
+      setProjects(projectsList);
+      setPartners(partnersList);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError("Gagal mengambil data. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const visibleProjects = projects.slice(0, visibleCount);
+  const hasMoreProjects = visibleCount < projects.length;
 
   const loadMore = () => {
-    setVisibleCount((prev) => Math.min(prev + 3, projectsData.length));
+    setVisibleCount((prev) => Math.min(prev + 3, projects.length));
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <>
+        <ProjectsHero />
+        <section className="py-16 bg-[#F8FAFC] pt-10">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">Memuat data proyek...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <>
+        <ProjectsHero />
+        <section className="py-16 bg-[#F8FAFC] pt-10">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+              <p className="text-red-500 text-lg mb-4">{error}</p>
+              <button
+                onClick={fetchData}
+                className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
@@ -214,30 +119,42 @@ const ProjectsPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Tampilan Desktop: Grid 3 Kolom */}
-            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleProjects.map((project, index) => (
-                <ProjectCard key={project.id} project={project} index={index} />
-              ))}
-            </div>
+            {projects.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                Belum ada data proyek.
+              </div>
+            ) : (
+              <>
+                {/* Tampilan Desktop: Grid 3 Kolom */}
+                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {visibleProjects.map((project, index) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      index={index}
+                    />
+                  ))}
+                </div>
 
-            {/* Tampilan Mobile: Swiper Slider */}
-            <div className="block md:hidden pb-8">
-              <Swiper
-                modules={[Pagination, Autoplay]}
-                spaceBetween={20}
-                slidesPerView={1}
-                pagination={{ clickable: true, dynamicBullets: true }}
-                autoplay={{ delay: 4000, disableOnInteraction: false }}
-                className="projects-slider-mobile"
-              >
-                {visibleProjects.map((project, index) => (
-                  <SwiperSlide key={project.id}>
-                    <ProjectCard project={project} index={index} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
+                {/* Tampilan Mobile: Swiper Slider */}
+                <div className="block md:hidden pb-8">
+                  <Swiper
+                    modules={[Pagination, Autoplay]}
+                    spaceBetween={20}
+                    slidesPerView={1}
+                    pagination={{ clickable: true, dynamicBullets: true }}
+                    autoplay={{ delay: 4000, disableOnInteraction: false }}
+                    className="projects-slider-mobile"
+                  >
+                    {visibleProjects.map((project, index) => (
+                      <SwiperSlide key={project.id}>
+                        <ProjectCard project={project} index={index} />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
+              </>
+            )}
           </motion.div>
 
           {/* Load More Button */}
@@ -258,7 +175,7 @@ const ProjectsPage = () => {
           )}
 
           {/* Bagian Partners (Slider Animation) */}
-          <ProjectsPartners partners={partnersData} />
+          <ProjectsPartners partners={partners} />
         </div>
       </section>
     </>

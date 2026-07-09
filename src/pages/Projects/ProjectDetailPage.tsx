@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 
 // Import Swiper
@@ -24,98 +24,26 @@ import {
   FaCircleCheck,
 } from "react-icons/fa6";
 
-// ==========================================
-// 1. DEFINISIKAN TYPE / INTERFACE
-// ==========================================
-interface ProjectData {
-  id: number;
-  nama_proyek: string;
-  lokasi: string;
-  tahun: string;
-  deskripsi: string;
-  client: string;
-  foto1: string;
-  foto2: string;
-  foto3: string;
-  foto4: string;
-  foto5: string;
-  status?: string;
-  gallery_extra?: string[];
-}
+// Import API dan types
+import { projectAPI } from "../../api/project";
+import type { Project } from "../../types/project";
+import { getImageUrl } from "../../api/axios";
 
+// Placeholder image
+const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' font-family='system-ui' font-size='20' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+// Interface untuk proyek terkait
 interface RelatedProject {
   id: number;
   nama_proyek: string;
   lokasi: string;
   tahun: string;
-  foto1: string;
+  foto1?: string;
 }
 
 // ==========================================
-// 2. DATA DUMMY PROJECT DETAIL
-// ==========================================
-const projectData: ProjectData = {
-  id: 1,
-  nama_proyek: "Office Building Jakarta",
-  lokasi: "Jakarta, Indonesia",
-  tahun: "2024",
-  deskripsi: `Office Building Jakarta merupakan gedung perkantoran modern bertaraf 12 lantai yang dirancang dengan konsep arsitektur kontemporer dan berfokus pada kenyamanan serta efisiensi energi.
-
-Proyek ini mencakup pekerjaan struktur, arsitektur, mekanikal, elektrikal, plumbing, serta interior dengan standar kualitas tinggi. Kami menggunakan material terbaik dan teknologi terbaru untuk memastikan bangunan yang aman, efisien, dan ramah lingkungan.`,
-  client: "PT. Global Mandiri",
-  status: "Completed",
-  foto1:
-    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
-  foto2:
-    "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  foto3:
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-  foto4:
-    "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  foto5:
-    "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-};
-
-// ==========================================
-// 3. DATA DUMMY PROYEK TERKAIT
-// ==========================================
-const relatedProjectsData: RelatedProject[] = [
-  {
-    id: 2,
-    nama_proyek: "Green Villa Residence",
-    lokasi: "Bandung, Indonesia",
-    tahun: "2023",
-    foto1:
-      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",
-  },
-  {
-    id: 3,
-    nama_proyek: "Cikampek Toll Road Section 2",
-    lokasi: "West Java, Indonesia",
-    tahun: "2024",
-    foto1:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&q=80",
-  },
-  {
-    id: 4,
-    nama_proyek: "Logistics Warehouse",
-    lokasi: "Surabaya, Indonesia",
-    tahun: "2023",
-    foto1:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  },
-  {
-    id: 5,
-    nama_proyek: "University Building",
-    lokasi: "Yogyakarta, Indonesia",
-    tahun: "2022",
-    foto1:
-      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80",
-  },
-];
-
-// ==========================================
-// 4. KOMPONEN - KOMPONEN
+// KOMPONEN - KOMPONEN
 // ==========================================
 
 // --- KOMPONEN BREADCRUMB ---
@@ -141,6 +69,11 @@ interface ProjectGalleryProps {
 const ProjectGallery = ({ images }: ProjectGalleryProps) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
 
+  // Filter gambar yang valid
+  const validImages = images.filter((img) => img && img.trim() !== "");
+  const galleryImages =
+    validImages.length > 0 ? validImages : [PLACEHOLDER_IMAGE];
+
   return (
     <div className="space-y-4">
       {/* Main Image Slider */}
@@ -154,46 +87,54 @@ const ProjectGallery = ({ images }: ProjectGalleryProps) => {
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         className="rounded-2xl overflow-hidden shadow-sm h-[350px] md:h-[450px]"
       >
-        {images.map((img, index) => (
+        {galleryImages.map((img, index) => (
           <SwiperSlide key={index}>
             <img
-              src={img}
+              src={img.startsWith("http") ? img : getImageUrl(img)}
               alt={`Gallery ${index}`}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+              }}
             />
           </SwiperSlide>
         ))}
       </Swiper>
 
       {/* Thumbnail Slider */}
-      <Swiper
-        onSwiper={setThumbsSwiper}
-        spaceBetween={12}
-        slidesPerView={4}
-        freeMode={true}
-        watchSlidesProgress={true}
-        modules={[Navigation, Thumbs]}
-        className="thumb-slider h-20 md:h-24"
-      >
-        {images.map((img, index) => (
-          <SwiperSlide key={index}>
-            <button className="w-full h-full rounded-lg overflow-hidden border-2 border-transparent hover:border-[#F97316] transition-all">
-              <img
-                src={img}
-                alt={`Thumb ${index}`}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      {galleryImages.length > 1 && (
+        <Swiper
+          onSwiper={setThumbsSwiper}
+          spaceBetween={12}
+          slidesPerView={Math.min(4, galleryImages.length)}
+          freeMode={true}
+          watchSlidesProgress={true}
+          modules={[Navigation, Thumbs]}
+          className="thumb-slider h-20 md:h-24"
+        >
+          {galleryImages.map((img, index) => (
+            <SwiperSlide key={index}>
+              <button className="w-full h-full rounded-lg overflow-hidden border-2 border-transparent hover:border-[#F97316] transition-all">
+                <img
+                  src={img.startsWith("http") ? img : getImageUrl(img)}
+                  alt={`Thumb ${index}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                  }}
+                />
+              </button>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
     </div>
   );
 };
 
 // --- KOMPONEN ABOUT PROJECT (Bagian Kiri Atas) ---
 interface AboutProjectProps {
-  project: ProjectData;
+  project: Project;
 }
 
 const AboutProject = ({ project }: AboutProjectProps) => {
@@ -216,7 +157,7 @@ const AboutProject = ({ project }: AboutProjectProps) => {
 
 // --- KOMPONEN INFO PROYEK (Kanan) ---
 interface ProjectInfoProps {
-  project: ProjectData;
+  project: Project;
 }
 
 const ProjectInfo = ({ project }: ProjectInfoProps) => {
@@ -227,13 +168,27 @@ const ProjectInfo = ({ project }: ProjectInfoProps) => {
       transition={{ duration: 0.6, delay: 0.2 }}
       className="space-y-6"
     >
-      {/* Badge Kategori */}
-      <div className="flex justify-between items-start">
+      {/* Share & Print Buttons */}
+      <div className="flex justify-end items-start">
         <div className="flex gap-3 text-gray-400">
-          <button className="hover:text-[#F97316] transition-colors">
+          <button
+            className="hover:text-[#F97316] transition-colors"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: project.nama_proyek,
+                  text: project.deskripsi,
+                  url: window.location.href,
+                });
+              }
+            }}
+          >
             <FaShareNodes />
           </button>
-          <button className="hover:text-[#F97316] transition-colors">
+          <button
+            className="hover:text-[#F97316] transition-colors"
+            onClick={() => window.print()}
+          >
             <FaPrint />
           </button>
         </div>
@@ -268,15 +223,17 @@ const ProjectInfo = ({ project }: ProjectInfoProps) => {
             : {project.nama_proyek}
           </span>
         </div>
-        <div className="flex items-center gap-4 text-sm">
-          <div className="w-8 h-8 bg-gray-50 rounded flex items-center justify-center text-[#0F172A]">
-            <FaUser />
+        {project.client && (
+          <div className="flex items-center gap-4 text-sm">
+            <div className="w-8 h-8 bg-gray-50 rounded flex items-center justify-center text-[#0F172A]">
+              <FaUser />
+            </div>
+            <span className="text-gray-500 w-24 shrink-0">Client</span>
+            <span className="font-medium text-[#0F172A] ml-auto">
+              : {project.client}
+            </span>
           </div>
-          <span className="text-gray-500 w-24 shrink-0">Client</span>
-          <span className="font-medium text-[#0F172A] ml-auto">
-            : {project.client}
-          </span>
-        </div>
+        )}
         <div className="flex items-center gap-4 text-sm">
           <div className="w-8 h-8 bg-gray-50 rounded flex items-center justify-center text-[#0F172A]">
             <FaCalendar />
@@ -292,7 +249,7 @@ const ProjectInfo = ({ project }: ProjectInfoProps) => {
           </div>
           <span className="text-gray-500 w-24 shrink-0">Status</span>
           <span className="font-medium text-[#0F172A] ml-auto">
-            : {project.status || "Completed"}
+            : Completed
           </span>
         </div>
       </div>
@@ -306,6 +263,10 @@ interface RelatedProjectsProps {
 }
 
 const RelatedProjects = ({ projects }: RelatedProjectsProps) => {
+  if (!projects || projects.length === 0) {
+    return null;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -330,38 +291,49 @@ const RelatedProjects = ({ projects }: RelatedProjectsProps) => {
           }}
           className="pb-12 md:pb-0"
         >
-          {projects.map((project) => (
-            <SwiperSlide key={project.id}>
-              <motion.div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
-                <div className="h-40 overflow-hidden">
-                  <img
-                    src={project.foto1}
-                    alt={project.nama_proyek}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-5 flex-grow flex flex-col">
-                  <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors">
-                    {project.nama_proyek}
-                  </h4>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                    <FaLocationDot className="w-3 h-3" />
-                    <span>{project.lokasi}</span>
+          {projects.map((project) => {
+            const imageUrl = project.foto1
+              ? project.foto1.startsWith("http")
+                ? project.foto1
+                : getImageUrl(project.foto1)
+              : PLACEHOLDER_IMAGE;
+
+            return (
+              <SwiperSlide key={project.id}>
+                <motion.div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
+                  <div className="h-40 overflow-hidden bg-gray-100">
+                    <img
+                      src={imageUrl}
+                      alt={project.nama_proyek}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                      }}
+                    />
                   </div>
-                  <span className="text-xs text-gray-400 mb-3">
-                    {project.tahun}
-                  </span>
-                  <Link
-                    to={`/projects/${project.id}`}
-                    className="inline-flex items-center text-[#F97316] font-semibold text-sm hover:gap-2 transition-all group-hover:gap-2 mt-auto"
-                  >
-                    View Project{" "}
-                    <FaArrowRight className="ml-2 w-3 h-3 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </div>
-              </motion.div>
-            </SwiperSlide>
-          ))}
+                  <div className="p-5 flex-grow flex flex-col">
+                    <h4 className="font-bold text-[#0F172A] text-base mb-1 group-hover:text-[#F97316] transition-colors line-clamp-2">
+                      {project.nama_proyek}
+                    </h4>
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <FaLocationDot className="w-3 h-3" />
+                      <span className="line-clamp-1">{project.lokasi}</span>
+                    </div>
+                    <span className="text-xs text-gray-400 mb-3">
+                      {project.tahun}
+                    </span>
+                    <Link
+                      to={`/projects/${project.id}`}
+                      className="inline-flex items-center text-[#F97316] font-semibold text-sm hover:gap-2 transition-all group-hover:gap-2 mt-auto"
+                    >
+                      View Project{" "}
+                      <FaArrowRight className="ml-2 w-3 h-3 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </div>
+                </motion.div>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       </div>
     </motion.div>
@@ -406,52 +378,165 @@ const ProjectCtaBanner = () => {
 };
 
 // ==========================================
-// 5. HALAMAN UTAMA PROJECT DETAIL
+// HALAMAN UTAMA PROJECT DETAIL
 // ==========================================
 const ProjectDetailPage = () => {
-  // Persiapan data gallery dari foto1 - foto5
-  const galleryImages = [
-    projectData.foto1,
-    projectData.foto2,
-    projectData.foto3,
-    projectData.foto4,
-    projectData.foto5,
-  ].filter(Boolean);
+  const { id } = useParams<{ id: string }>();
+  const [project, setProject] = useState<Project | null>(null);
+  const [relatedProjects, setRelatedProjects] = useState<RelatedProject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  return (
-    <>
+  // Fungsi untuk mengambil data project detail
+  const fetchProjectDetail = async () => {
+    if (!id) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Ambil data project detail
+      const projectData = await projectAPI.getById(parseInt(id));
+      console.log("Project Data:", projectData);
+
+      if (!projectData || !projectData.id) {
+        throw new Error("Project data is empty or invalid");
+      }
+
+      setProject(projectData);
+
+      // Ambil semua project untuk project terkait
+      try {
+        const allProjects = await projectAPI.getAll();
+        console.log("All Projects:", allProjects);
+
+        if (
+          allProjects &&
+          Array.isArray(allProjects) &&
+          allProjects.length > 0
+        ) {
+          // Filter project terkait (project lain yang bukan project ini)
+          const related = allProjects
+            .filter((p: Project) => p.id !== projectData.id)
+            .slice(0, 4)
+            .map((p: Project) => ({
+              id: p.id,
+              nama_proyek: p.nama_proyek,
+              lokasi: p.lokasi,
+              tahun: p.tahun,
+              foto1: p.foto1 || p.foto2 || p.foto3 || p.foto4 || p.foto5 || "",
+            }));
+
+          setRelatedProjects(related);
+        }
+      } catch (relatedErr) {
+        console.warn("Failed to fetch related projects:", relatedErr);
+      }
+    } catch (err) {
+      console.error("Error fetching project detail:", err);
+      setError("Gagal mengambil detail proyek. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjectDetail();
+  }, [id]);
+
+  // Fungsi untuk mendapatkan daftar gambar
+  const getGalleryImages = (project: Project): string[] => {
+    const images = [
+      project.foto1,
+      project.foto2,
+      project.foto3,
+      project.foto4,
+      project.foto5,
+    ].filter(
+      (img): img is string =>
+        img !== undefined && img !== null && img.trim() !== "",
+    );
+
+    return images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+  };
+
+  // Loading state
+  if (loading) {
+    return (
       <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
         <div className="container mx-auto px-4 md:px-8 max-w-6xl">
-          <Breadcrumb title={projectData.nama_proyek} />
-
-          {/* Bagian Atas: Gallery & Info */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
-            {/* Kiri: Gallery */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <ProjectGallery images={galleryImages} />
-            </motion.div>
-
-            {/* Kanan: Info Proyek */}
-            <ProjectInfo project={projectData} />
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Memuat detail proyek...</p>
+            </div>
           </div>
-
-          {/* Bagian About The Project (Letakkan di atas Quick Specs) */}
-          <div className="mt-12">
-            <AboutProject project={projectData} />
-          </div>
-
-          {/* Bagian Proyek Terkait (Menggantikan Project Gallery) */}
-          <RelatedProjects projects={relatedProjectsData} />
-
-          {/* CTA Banner */}
-          <ProjectCtaBanner />
         </div>
       </section>
-    </>
+    );
+  }
+
+  // Error state
+  if (error || !project) {
+    return (
+      <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
+        <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <p className="text-red-500 text-lg mb-4">
+              {error || "Proyek tidak ditemukan"}
+            </p>
+            <button
+              onClick={fetchProjectDetail}
+              className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+            >
+              Coba Lagi
+            </button>
+            <Link
+              to="/projects"
+              className="mt-4 text-[#F97316] hover:underline"
+            >
+              Kembali ke Proyek
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const galleryImages = getGalleryImages(project);
+
+  return (
+    <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
+      <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+        <Breadcrumb title={project.nama_proyek} />
+
+        {/* Bagian Atas: Gallery & Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+          {/* Kiri: Gallery */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <ProjectGallery images={galleryImages} />
+          </motion.div>
+
+          {/* Kanan: Info Proyek */}
+          <ProjectInfo project={project} />
+        </div>
+
+        {/* Bagian About The Project */}
+        <div className="mt-12">
+          <AboutProject project={project} />
+        </div>
+
+        {/* Bagian Proyek Terkait */}
+        <RelatedProjects projects={relatedProjects} />
+
+        {/* CTA Banner */}
+        <ProjectCtaBanner />
+      </div>
+    </section>
   );
 };
 
