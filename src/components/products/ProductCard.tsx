@@ -1,6 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { FaArrowRight } from "react-icons/fa6";
+import { FaArrowRight, FaRupiahSign } from "react-icons/fa6";
+import { getImageUrl } from "../../api/axios";
+
+// Placeholder image
+const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' font-family='system-ui' font-size='20' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 interface ProductCardProps {
   product: {
@@ -9,39 +14,71 @@ interface ProductCardProps {
     desc: string;
     category: string;
     img: string;
+    price?: number;
+    rawProduct?: any; // Untuk data lengkap dari API
   };
   index: number;
 }
 
 const ProductCard = ({ product, index }: ProductCardProps) => {
+  // Fungsi untuk format harga ke Rupiah
+  const formatPrice = (price?: number): string => {
+    if (!price) return "Hubungi Kami";
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  // Fungsi untuk mendapatkan URL gambar
+  const getImageSrc = (imgPath: string): string => {
+    if (!imgPath) return PLACEHOLDER_IMAGE;
+    return getImageUrl(imgPath);
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className="group/card h-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col"
     >
-      <div className="h-56 overflow-hidden relative">
+      <div className="relative h-48 overflow-hidden shrink-0 bg-gray-100">
         <img
-          src={product.img}
+          src={getImageSrc(product.img)}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+          }}
+          loading="lazy"
         />
+        {product.price && (
+          <div className="absolute bottom-2 right-2 bg-[#0F172A]/80 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+            {formatPrice(product.price)}
+          </div>
+        )}
       </div>
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-[#0F172A] mb-2 group-hover:text-[#F97316] transition-colors">
+
+      <div className="p-5 flex-grow flex flex-col">
+        <span className="text-xs font-medium text-[#F97316] bg-orange-50 px-2 py-1 rounded-full inline-block mb-2 self-start">
+          {product.category}
+        </span>
+        <h4 className="font-bold text-[#0F172A] text-lg mb-1 group-hover/card:text-[#F97316] transition-colors line-clamp-1">
           {product.name}
-        </h3>
-        <p className="text-gray-500 text-sm mb-4 leading-relaxed">
+        </h4>
+        <p className="text-sm text-gray-500 line-clamp-2 flex-grow">
           {product.desc}
         </p>
+
         <Link
           to={`/products/${product.id}`}
-          className="inline-flex items-center text-[#F97316] font-semibold text-sm hover:gap-2 transition-all group-hover:gap-2"
+          className="mt-4 text-sm font-semibold text-[#0F172A] group-hover/card:gap-2 flex items-center transition-all"
         >
-          View Details{" "}
-          <FaArrowRight className="ml-2 w-3 h-3 transition-transform group-hover:translate-x-1" />
+          Detail Product <FaArrowRight className="ml-1 w-3 h-3" />
         </Link>
       </div>
     </motion.div>

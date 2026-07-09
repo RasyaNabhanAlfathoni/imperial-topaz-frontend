@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MainLayout from "../../layouts/MainLayout";
 
@@ -9,84 +9,117 @@ import ProductCard from "../../components/products/ProductCard";
 import ProductsCtaBanner from "../../components/products/ProductsCtaBanner";
 import ProductsFeatures from "../../components/products/ProductsFeatures";
 
-// --- DATA DUMMY PRODUK ---
-// Di proyek nyata, data ini akan diambil dari API `useProducts()`
-const categories = [
-  "All Products",
-  "Raw Materials",
-  "Steel & Metal",
-  "Concrete",
-  "Finishing Materials",
-  "Equipment",
-];
-
-const productsData = [
-  {
-    id: 1,
-    name: "Cement",
-    desc: "High quality cement for all types of construction.",
-    category: "Raw Materials",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  },
-  {
-    id: 2,
-    name: "Steel Rebar",
-    desc: "Strong and durable steel for reinforced concrete.",
-    category: "Steel & Metal",
-    img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-  },
-  {
-    id: 3,
-    name: "Concrete Mix",
-    desc: "Ready-mix concrete with consistent quality.",
-    category: "Concrete",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  },
-  {
-    id: 4,
-    name: "Hollow Block",
-    desc: "Lightweight and durable for wall construction.",
-    category: "Finishing Materials",
-    img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  },
-  {
-    id: 5,
-    name: "Bricks",
-    desc: "High strength bricks for masonry work.",
-    category: "Raw Materials",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  },
-  {
-    id: 6,
-    name: "Sand",
-    desc: "Clean and graded sand for construction.",
-    category: "Raw Materials",
-    img: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-  },
-  {
-    id: 7,
-    name: "Crushed Stone",
-    desc: "Various sizes of crushed stone for concrete.",
-    category: "Concrete",
-    img: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-  },
-  {
-    id: 8,
-    name: "Heavy Equipment",
-    desc: "Reliable equipment to get the job done.",
-    category: "Equipment",
-    img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-  },
-];
+// Import API dan types
+import { productAPI } from "../../api/product";
+import type { Product, Category } from "../../types/product";
 
 const ProductsPage = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState("All Products");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Filter produk berdasarkan kategori
+  // Fungsi untuk mengambil data dari API
+  const fetchProductsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Ambil data produk dan kategori secara paralel
+      const [productsData, categoriesData] = await Promise.all([
+        productAPI.getAll(),
+        productAPI.getCategories(),
+      ]);
+
+      // Pastikan data adalah array
+      const productsList = Array.isArray(productsData) ? productsData : [];
+      const categoriesList = Array.isArray(categoriesData)
+        ? categoriesData
+        : [];
+
+      setProducts(productsList);
+      setCategories(categoriesList);
+
+      // Reset filter ke "All Products" saat data berubah
+      setActiveCategory("All Products");
+    } catch (err) {
+      console.error("Error fetching products data:", err);
+      setError("Gagal mengambil data produk. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Ambil data saat komponen pertama kali di-render
+  useEffect(() => {
+    fetchProductsData();
+  }, []);
+
+  // Buat daftar kategori untuk filter (termasuk "All Products")
+  const categoryFilterList = [
+    "All Products",
+    ...categories.map((cat: Category) => cat.kategori_produk),
+  ];
+
+  // Filter produk berdasarkan kategori yang dipilih
   const filteredProducts =
     activeCategory === "All Products"
-      ? productsData
-      : productsData.filter((product) => product.category === activeCategory);
+      ? products
+      : products.filter((product: Product) => {
+          // Cari kategori produk berdasarkan id_kategori_produk
+          const category = categories.find(
+            (cat: Category) => cat.id === product.id_kategori_produk,
+          );
+          return category?.kategori_produk === activeCategory;
+        });
+
+  // Fungsi untuk mendapatkan nama kategori dari ID
+  const getCategoryName = (categoryId: number): string => {
+    const category = categories.find((cat: Category) => cat.id === categoryId);
+    return category ? category.kategori_produk : "Uncategorized";
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <>
+        <ProductsHero />
+        <section className="py-16 bg-[#F8FAFC] relative -mt-8 z-20 rounded-t-3xl">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">Memuat data produk...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <>
+        <ProductsHero />
+        <section className="py-16 bg-[#F8FAFC] relative -mt-8 z-20 rounded-t-3xl">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+              <p className="text-red-500 text-lg mb-4">{error}</p>
+              <button
+                onClick={fetchProductsData}
+                className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
@@ -96,10 +129,15 @@ const ProductsPage = () => {
         <div className="container mx-auto px-4 md:px-8">
           {/* Filter Kategori */}
           <CategoryFilter
-            categories={categories}
+            categories={categoryFilterList}
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
+
+          {/* Jumlah produk yang ditampilkan */}
+          <div className="text-sm text-gray-400 mb-6 text-right">
+            Showing {filteredProducts.length} of {products.length} products
+          </div>
 
           {/* Grid Produk */}
           <AnimatePresence mode="wait">
@@ -112,16 +150,30 @@ const ProductsPage = () => {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
             >
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((product, index) => (
+                filteredProducts.map((product: Product, index: number) => (
                   <ProductCard
                     key={product.id}
-                    product={product}
+                    product={{
+                      id: product.id,
+                      name: product.nama_produk,
+                      desc: product.deskripsi,
+                      category: getCategoryName(product.id_kategori_produk),
+                      img:
+                        product.foto1 ||
+                        product.foto2 ||
+                        product.foto3 ||
+                        product.foto4 ||
+                        product.foto5 ||
+                        "",
+                      price: product.harga_per_pcs,
+                      rawProduct: product, // Kirim data lengkap jika diperlukan
+                    }}
                     index={index}
                   />
                 ))
               ) : (
                 <div className="col-span-full text-center py-12 text-gray-500">
-                  No products found in this category.
+                  Tidak ada produk ditemukan di kategori ini.
                 </div>
               )}
             </motion.div>
