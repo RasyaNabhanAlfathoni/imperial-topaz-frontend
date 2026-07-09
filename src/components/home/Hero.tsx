@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaChevronLeft, FaChevronRight, FaArrowRight } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const slides = [
   {
@@ -29,6 +30,20 @@ const Hero = () => {
     }, 6000);
     return () => clearInterval(timer);
   }, []);
+
+  const navigate = useNavigate();
+
+  const scrollToSolutions = () => {
+    navigate("/");
+
+    setTimeout(() => {
+      const element = document.getElementById("solutions");
+      if (element) {
+        // scrollIntoView akan menggulirkan layar ke elemen tersebut
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+  };
 
   return (
     <div className="relative h-screen min-h-[600px] max-h-[800px] w-full overflow-hidden mt-[60px]">
@@ -69,12 +84,12 @@ const Hero = () => {
                   {slide.subtitle}
                 </p>
                 <div className="flex flex-wrap gap-4 pt-4">
-                  <Link
-                    to="/solutions"
+                  <button
+                    onClick={scrollToSolutions}
                     className="bg-[#F97316] hover:bg-[#ea580c] text-white px-8 py-3.5 rounded-md font-semibold flex items-center gap-2 transition-all hover:shadow-lg"
                   >
                     Explore Solutions <FaArrowRight className="w-4 h-4" />
-                  </Link>
+                  </button>
                   <Link
                     to="/projects"
                     className="border border-white/30 hover:border-white bg-white/10 backdrop-blur-sm text-white px-8 py-3.5 rounded-md font-semibold transition-all"

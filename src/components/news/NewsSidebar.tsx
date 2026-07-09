@@ -110,26 +110,6 @@ const NewsSidebar = ({
           ))}
         </div>
       </div>
-
-      {/* Newsletter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h4 className="font-bold text-[#0F172A] text-lg mb-2">
-          Berlangganan Berita
-        </h4>
-        <p className="text-sm text-gray-500 mb-4">
-          Dapatkan update terbaru langsung ke email Anda.
-        </p>
-        <div className="space-y-3">
-          <input
-            type="email"
-            placeholder="Masukkan email Anda"
-            className="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent"
-          />
-          <button className="w-full bg-[#F97316] hover:bg-[#ea580c] text-white py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-orange-200">
-            Berlangganan
-          </button>
-        </div>
-      </div>
     </motion.div>
   );
 };

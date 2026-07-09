@@ -42,7 +42,7 @@ const services = [
 
 const ServicesSection = () => {
   return (
-    <section className="py-24 bg-[#F8FAFC]">
+    <section id="solutions" className="py-24 bg-[#F8FAFC]">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="text-center mb-16">
