@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import MainLayout from "../../layouts/MainLayout";
@@ -9,143 +9,70 @@ import NewsFilter from "../../components/news/NewsFilter";
 import NewsCard from "../../components/news/NewsCard";
 import NewsSidebar from "../../components/news/NewsSidebar";
 
-// ==========================================
-// 1. DATA DUMMY KATEGORI BERITA (kategori_beritas)
-// ==========================================
-const categoriesData = [
-  { id: 1, kategori_berita: "Perusahaan" },
-  { id: 2, kategori_berita: "Proyek" },
-  { id: 3, kategori_berita: "Industri" },
-  { id: 4, kategori_berita: "Tips & Edukasi" },
-  { id: 5, kategori_berita: "Event" },
-];
+// Import API dan types
+import { newsAPI } from "../../api/news";
+import type { News, NewsCategory } from "../../types/news";
+import { getImageUrl } from "../../api/axios";
 
 // ==========================================
-// 2. DATA DUMMY BERITA (beritas)
-// ==========================================
-const newsData = [
-  {
-    id: 1,
-    judul: "BuildCore Raih Penghargaan Kontraktor Terbaik 2024",
-    slug: "buildcore-raih-penghargaan-kontraktor-terbaik-2024",
-    konten:
-      "Penghargaan ini menjadi bukti komitmen kami dalam memberikan hasil terbaik bagi klien.",
-    id_kategori_berita: 1,
-    kategori_berita: "Perusahaan",
-    thumbnail:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    is_featured: true,
-    created_at: "20 Mei 2025",
-  },
-  {
-    id: 2,
-    judul: "Proyek Jembatan Cikampek Toll Road Section 2 Selesai",
-    slug: "proyek-jembatan-cikampek-toll-road-section-2-selesai",
-    konten:
-      "Pembangunan jembatan sepanjang 1,2 km telah selesai dengan hasil sesuai standar.",
-    id_kategori_berita: 2,
-    kategori_berita: "Proyek",
-    thumbnail:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&q=80",
-    is_featured: true,
-    created_at: "18 Mei 2025",
-  },
-  {
-    id: 3,
-    judul: "Tren Konstruksi 2025: Inovasi & Keberlanjutan",
-    slug: "tren-konstruksi-2025-inovasi-keberlanjutan",
-    konten:
-      "Industri konstruksi terus berkembang dengan teknologi baru dan pendekatan berkelanjutan.",
-    id_kategori_berita: 3,
-    kategori_berita: "Industri",
-    thumbnail:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    is_featured: true,
-    created_at: "16 Mei 2025",
-  },
-  {
-    id: 4,
-    judul: "5 Tips Memilih Material Konstruksi Berkualitas",
-    slug: "5-tips-memilih-material-konstruksi-berkualitas",
-    konten:
-      "Panduan singkat untuk memilih material konstruksi yang tepat dan tahan lama.",
-    id_kategori_berita: 4,
-    kategori_berita: "Tips & Edukasi",
-    thumbnail:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    is_featured: false,
-    created_at: "12 Mei 2025",
-  },
-  {
-    id: 5,
-    judul: "BuildCore Gelar Safety Training untuk Seluruh Karyawan",
-    slug: "buildcore-gelar-safety-training-untuk-seluruh-karyawan",
-    konten:
-      "Pelatihan keselamatan kerja rutin untuk meningkatkan budaya kerja yang aman.",
-    id_kategori_berita: 1,
-    kategori_berita: "Perusahaan",
-    thumbnail:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-    is_featured: false,
-    created_at: "8 Mei 2025",
-  },
-  {
-    id: 6,
-    judul: "BuildCore Hadiri Indonesia Construction Expo 2025",
-    slug: "buildcore-hadiri-indonesia-construction-expo-2025",
-    konten: "Partisipasi kami dalam pameran konstruksi terbesar di Indonesia.",
-    id_kategori_berita: 5,
-    kategori_berita: "Event",
-    thumbnail:
-      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80",
-    is_featured: false,
-    created_at: "5 Mei 2025",
-  },
-];
-
-// ==========================================
-// 3. DATA BERITA POPULER (Untuk Sidebar)
-// ==========================================
-const popularNewsData = [
-  {
-    id: 2,
-    judul: "Proyek Jembatan Cikampek Toll Road Section 2 Selesai",
-    slug: "proyek-jembatan-cikampek-toll-road-section-2-selesai",
-    thumbnail:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&q=80",
-    date: "18 Mei 2025",
-  },
-  {
-    id: 3,
-    judul: "Tren Konstruksi 2025: Inovasi & Keberlanjutan",
-    slug: "tren-konstruksi-2025-inovasi-keberlanjutan",
-    thumbnail:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    date: "16 Mei 2025",
-  },
-  {
-    id: 1,
-    judul: "BuildCore Raih Penghargaan Kontraktor Terbaik 2024",
-    slug: "buildcore-raih-penghargaan-kontraktor-terbaik-2024",
-    thumbnail:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80",
-    date: "20 Mei 2025",
-  },
-];
-
-// ==========================================
-// 4. HALAMAN UTAMA NEWS
+// HALAMAN UTAMA NEWS
 // ==========================================
 const NewsPage = () => {
+  const [news, setNews] = useState<News[]>([]);
+  const [categories, setCategories] = useState<NewsCategory[]>([]);
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 6;
+
+  // Fungsi untuk mengambil data
+  const fetchNewsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Ambil data berita dan kategori secara paralel
+      const [newsData, categoriesData] = await Promise.all([
+        newsAPI.getAll(),
+        newsAPI.getCategories(),
+      ]);
+
+      const newsList = Array.isArray(newsData) ? newsData : [];
+      const categoriesList = Array.isArray(categoriesData)
+        ? categoriesData
+        : [];
+
+      // Urutkan berita berdasarkan tanggal terbaru
+      const sortedNews = newsList.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
+
+      setNews(sortedNews);
+      setCategories(categoriesList);
+    } catch (err) {
+      console.error("Error fetching news data:", err);
+      setError("Gagal mengambil data berita. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNewsData();
+  }, []);
 
   // Filter berita berdasarkan kategori
   const filteredNews =
     activeCategory === "Semua"
-      ? newsData
-      : newsData.filter((news) => news.kategori_berita === activeCategory);
+      ? news
+      : news.filter((item) => {
+          const category = categories.find(
+            (c) => c.id === item.id_kategori_berita,
+          );
+          return category?.kategori_berita === activeCategory;
+        });
 
   // Pagination
   const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
@@ -153,22 +80,67 @@ const NewsPage = () => {
   const currentNews = filteredNews.slice(startIndex, startIndex + itemsPerPage);
 
   // Hitung jumlah berita per kategori (untuk sidebar)
-  const categoryCounts = categoriesData.map((cat) => ({
+  const categoryCounts = categories.map((cat) => ({
     ...cat,
-    count: newsData.filter((n) => n.kategori_berita === cat.kategori_berita)
-      .length,
+    count: news.filter((n) => n.id_kategori_berita === cat.id).length,
   }));
+
+  // Fungsi untuk mendapatkan nama kategori
+  const getCategoryName = (categoryId: number): string => {
+    const category = categories.find((c) => c.id === categoryId);
+    return category ? category.kategori_berita : "Uncategorized";
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Fungsi untuk mengubah kategori (dipanggil dari Sidebar & Filter)
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
-    setCurrentPage(1); // Reset ke halaman 1 saat ganti filter
+    setCurrentPage(1);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <>
+        <NewsHero />
+        <section className="py-16 bg-[#F8FAFC] relative -mt-8 z-20 rounded-t-3xl">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">Memuat berita...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <>
+        <NewsHero />
+        <section className="py-16 bg-[#F8FAFC] relative -mt-8 z-20 rounded-t-3xl">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+              <p className="text-red-500 text-lg mb-4">{error}</p>
+              <button
+                onClick={fetchNewsData}
+                className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
@@ -176,31 +148,33 @@ const NewsPage = () => {
 
       <section className="py-16 bg-[#F8FAFC] relative -mt-8 z-20 rounded-t-3xl">
         <div className="container mx-auto px-4 md:px-8">
-          {/* GRID UTAMA: Mobile (Sidebar di atas, Konten di bawah) */}
+          {/* GRID UTAMA */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
-            {/* 
-              KOLOM SIDEBAR: 
-              - Di Mobile: order-1 (Paling atas)
-              - Di Desktop: lg:order-2 (Kanan)
-            */}
+            {/* SIDEBAR */}
             <div className="lg:col-span-1 order-1 lg:order-2">
               <NewsSidebar
                 categories={categoryCounts}
-                popularNews={popularNewsData}
+                popularNews={news.slice(0, 5).map((item) => ({
+                  id: item.id,
+                  judul: item.judul,
+                  slug: item.slug,
+                  thumbnail: item.thumbnail,
+                  date: new Date(item.created_at).toLocaleDateString("id-ID", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  }),
+                }))}
                 onCategoryChange={handleCategoryChange}
                 activeCategory={activeCategory}
               />
             </div>
 
-            {/* 
-              KOLOM KONTEN UTAMA: 
-              - Di Mobile: order-2 (Di bawah sidebar)
-              - Di Desktop: lg:order-1 (Kiri)
-            */}
+            {/* KONTEN UTAMA */}
             <div className="lg:col-span-2 order-2 lg:order-1">
-              {/* Filter Kategori (Tombol di atas konten) */}
+              {/* Filter Kategori */}
               <NewsFilter
-                categories={categoriesData}
+                categories={categories}
                 activeCategory={activeCategory}
                 onCategoryChange={handleCategoryChange}
               />
@@ -208,8 +182,17 @@ const NewsPage = () => {
               {/* Grid Berita */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {currentNews.length > 0 ? (
-                  currentNews.map((news, index) => (
-                    <NewsCard key={news.id} news={news} index={index} />
+                  currentNews.map((item, index) => (
+                    <NewsCard
+                      key={item.id}
+                      news={{
+                        ...item,
+                        kategori_berita: getCategoryName(
+                          item.id_kategori_berita,
+                        ),
+                      }}
+                      index={index}
+                    />
                   ))
                 ) : (
                   <div className="col-span-full text-center py-12 text-gray-500">

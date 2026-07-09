@@ -1,18 +1,27 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { FaMagnifyingGlass, FaCalendar } from "react-icons/fa6";
+import { FaTag, FaFire, FaMagnifyingGlass, FaCalendar } from "react-icons/fa6";
+import { getImageUrl } from "../../api/axios";
+
+// Placeholder image
+const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' font-family='system-ui' font-size='20' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 interface NewsSidebarProps {
-  categories: { id: number; kategori_berita: string; count?: number }[];
+  categories: {
+    id: number;
+    kategori_berita: string;
+    count: number;
+  }[];
   popularNews: {
     id: number;
     judul: string;
     slug: string;
-    thumbnail: string;
+    thumbnail?: string;
     date: string;
   }[];
-  onCategoryChange: (category: string) => void; // <--- Tambahkan ini
-  activeCategory: string; // <--- Tambahkan ini
+  onCategoryChange: (category: string) => void;
+  activeCategory: string;
 }
 
 const NewsSidebar = ({
@@ -21,6 +30,11 @@ const NewsSidebar = ({
   onCategoryChange,
   activeCategory,
 }: NewsSidebarProps) => {
+  const getThumbnail = (thumbnail?: string): string => {
+    if (!thumbnail) return PLACEHOLDER_IMAGE;
+    return thumbnail.startsWith("http") ? thumbnail : getImageUrl(thumbnail);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
@@ -92,7 +106,7 @@ const NewsSidebar = ({
             >
               <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
                 <img
-                  src={news.thumbnail}
+                  src={getThumbnail(news.thumbnail)}
                   alt={news.judul}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

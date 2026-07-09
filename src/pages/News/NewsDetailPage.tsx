@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import toast from "react-hot-toast";
 
@@ -18,92 +19,17 @@ import {
   FaChevronRight,
 } from "react-icons/fa6";
 
-// ==========================================
-// 1. DATA DUMMY BERITA DETAIL (Sesuai gambar)
-// ==========================================
-// Data ini akan diambil dari API berdasarkan slug/id
-const newsDetailData = {
-  id: 1,
-  judul: "BuildCore Raih Penghargaan Kontraktor Terbaik 2024",
-  slug: "buildcore-raih-penghargaan-kontraktor-terbaik-2024",
-  konten: `
-    <p>BuildCore dengan bangga mengumumkan bahwa kami telah meraih penghargaan <strong>"Kontraktor Terbaik 2024"</strong> dalam ajang Indonesia Construction Excellence Awards (ICEA) yang diselenggarakan oleh Asosiasi Konstruksi Indonesia.</p>
+// Import API dan types
+import { newsAPI } from "../../api/news";
+import type { News, NewsCategory } from "../../types/news";
+import { getImageUrl } from "../../api/axios";
 
-    <h3>Penghargaan atas Komitmen & Dedikasi</h3>
-    <p>Penghargaan ini diberikan sebagai bentuk apresiasi atas dedikasi kami dalam menghadirkan proyek-proyek berkualitas tinggi, tepat waktu, dan mengutamakan keselamatan kerja serta keberlanjutan lingkungan.</p>
-
-    <h3>Kriteria Penilaian</h3>
-    <p>Beberapa kriteria yang menjadi bahan penilaian dalam penghargaan ini antara lain:</p>
-    <ul>
-      <li>Kualitas hasil pekerjaan</li>
-      <li>Ketepatan waktu penyelesaian proyek</li>
-      <li>Inovasi dan penerapan teknologi</li>
-      <li>Keselamatan dan kesehatan kerja (K3)</li>
-      <li>Dampak positif terhadap lingkungan</li>
-    </ul>
-
-    <h3>Terima Kasih kepada Tim & Klien</h3>
-    <p>Penghargaan ini tidak lepas dari kerja keras seluruh tim BuildCore serta kepercayaan para klien dan mitra. Kami akan terus berkomitmen untuk memberikan yang terbaik dalam setiap proyek yang kami kerjakan.</p>
-  `,
-  id_kategori_berita: 1,
-  kategori_berita: "Perusahaan",
-  thumbnail:
-    "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80",
-  is_featured: true,
-  created_at: "20 Mei 2025",
-  read_time: "5 menit baca",
-  // Data dummy tambahan untuk kelengkapan tampilan
-  penulis: "Manajemen BuildCore",
-  meta_deskripsi:
-    "BuildCore meraih penghargaan Kontraktor Terbaik 2024 di ajang ICEA. Simak pencapaian dan komitmen kami dalam membangun masa depan.",
-};
+// Placeholder image
+const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' font-family='system-ui' font-size='20' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'%3ENo Image%3C/text%3E%3C/svg%3E";
 
 // ==========================================
-// 2. DATA DUMMY BERITA POPULER (Untuk Sidebar)
-// ==========================================
-const popularNewsData = [
-  {
-    id: 2,
-    judul: "Proyek Jembatan Cikampek Toll Road Section 2 Selesai",
-    slug: "proyek-jembatan-cikampek-toll-road-section-2-selesai",
-    thumbnail:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&q=80",
-    date: "18 Mei 2025",
-  },
-  {
-    id: 3,
-    judul: "Tren Konstruksi 2025: Inovasi & Keberlanjutan",
-    slug: "tren-konstruksi-2025-inovasi-keberlanjutan",
-    thumbnail:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80",
-    date: "16 Mei 2025",
-  },
-  {
-    id: 4,
-    judul: "5 Tips Memilih Material Konstruksi Berkualitas",
-    slug: "5-tips-memilih-material-konstruksi-berkualitas",
-    thumbnail:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80",
-    date: "12 Mei 2025",
-  },
-];
-
-// ==========================================
-// 4. DATA DUMMY ARTIKEL TERKAIT
-// ==========================================
-const relatedNewsData = [
-  {
-    id: 5,
-    judul: "BuildCore Gelar Safety Training untuk Seluruh Karyawan",
-    slug: "buildcore-gelar-safety-training-untuk-seluruh-karyawan",
-    thumbnail:
-      "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&q=80",
-    date: "8 Mei 2025",
-  },
-];
-
-// ==========================================
-// 5. KOMPONEN - KOMPONEN
+// KOMPONEN - KOMPONEN
 // ==========================================
 
 // --- KOMPONEN BREADCRUMB ---
@@ -128,12 +54,11 @@ const ShareButtons = () => {
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        // Tampilkan notifikasi sukses
         toast.success("Link berhasil disalin!", {
           duration: 3000,
           position: "bottom-right",
           style: {
-            background: "#0F172A", // Navy
+            background: "#0F172A",
             color: "#fff",
             padding: "16px",
             borderRadius: "8px",
@@ -143,7 +68,6 @@ const ShareButtons = () => {
         });
       })
       .catch(() => {
-        // Tampilkan notifikasi error jika gagal
         toast.error("Gagal menyalin link!", {
           duration: 3000,
           position: "bottom-right",
@@ -187,73 +111,38 @@ const ShareButtons = () => {
   );
 };
 
-// --- KOMPONEN BERITA POPULER (Sidebar) ---
-const PopularNewsWidget = () => {
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h4 className="font-bold text-[#0F172A] text-lg mb-4">Berita Populer</h4>
-      <div className="space-y-4">
-        {popularNewsData.slice(0, 3).map((news) => (
-          <Link
-            key={news.id}
-            to={`/news/${news.slug}`}
-            className="flex gap-4 group"
-          >
-            <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0">
-              <img
-                src={news.thumbnail}
-                alt={news.judul}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div>
-              <h5 className="text-sm font-semibold text-[#0F172A] group-hover:text-[#F97316] transition-colors line-clamp-2">
-                {news.judul}
-              </h5>
-              <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-                <FaCalendar className="w-3 h-3" />
-                <span>{news.date}</span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// --- KOMPONEN ARTIKEL TERKAIT (Sidebar) ---
-const RelatedArticleWidget = () => {
-  const article = relatedNewsData[0];
-  if (!article) return null;
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h4 className="font-bold text-[#0F172A] text-lg mb-4">Artikel Terkait</h4>
-      <div className="space-y-4">
-        <Link to={`/news/${article.slug}`} className="group block">
-          <div className="rounded-lg overflow-hidden mb-3">
-            <img
-              src={article.thumbnail}
-              alt={article.judul}
-              className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-          <h5 className="font-semibold text-[#0F172A] text-sm group-hover:text-[#F97316] transition-colors line-clamp-2">
-            {article.judul}
-          </h5>
-          <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-            <FaCalendar className="w-3 h-3" />
-            <span>{article.date}</span>
-          </div>
-        </Link>
-      </div>
-    </div>
-  );
-};
-
 // --- KOMPONEN KONTEN UTAMA BERITA ---
-const NewsContent = ({ news }: { news: typeof newsDetailData }) => {
+interface NewsContentProps {
+  news: News;
+  categoryName: string;
+}
+
+const NewsContent = ({ news, categoryName }: NewsContentProps) => {
+  // Format tanggal
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // Hitung estimasi waktu baca (1 menit per 200 kata)
+  const getReadTime = (content: string): string => {
+    const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
+    const minutes = Math.ceil(words / 200);
+    return `${minutes} menit baca`;
+  };
+
+  // Fungsi untuk mendapatkan thumbnail
+  const getThumbnail = (): string => {
+    if (!news.thumbnail) return PLACEHOLDER_IMAGE;
+    return news.thumbnail.startsWith("http")
+      ? news.thumbnail
+      : getImageUrl(news.thumbnail);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -30 }}
@@ -265,47 +154,52 @@ const NewsContent = ({ news }: { news: typeof newsDetailData }) => {
       <Breadcrumb title={news.judul} />
 
       {/* Badge FEATURED */}
-      <div>
-        <span className="bg-[#F97316] text-white px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-block">
-          FEATURED
-        </span>
-      </div>
+      {news.is_featured && (
+        <div>
+          <span className="bg-[#F97316] text-white px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-block">
+            FEATURED
+          </span>
+        </div>
+      )}
 
       {/* Judul */}
       <h1 className="text-3xl md:text-4xl font-bold text-[#0F172A] leading-tight">
         {news.judul}
       </h1>
 
-      {/* Meta Info (Kategori, Tanggal, Waktu Baca, Simpan) */}
+      {/* Meta Info */}
       <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-gray-500">
         <div className="flex items-center gap-2">
           <FaBuilding className="w-4 h-4 text-[#0F172A]" />
           <span className="text-[#0F172A] font-medium">
-            {news.kategori_berita}
+            {categoryName || "Uncategorized"}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <FaCalendar className="w-4 h-4 text-[#0F172A]" />
-          <span>{news.created_at}</span>
+          <span>{formatDate(news.created_at)}</span>
         </div>
         <div className="flex items-center gap-2">
           <FaClock className="w-4 h-4 text-[#0F172A]" />
-          <span>{news.read_time}</span>
+          <span>{getReadTime(news.konten)}</span>
         </div>
       </div>
 
       {/* Gambar Utama */}
-      <div className="rounded-2xl overflow-hidden shadow-sm">
+      <div className="rounded-2xl overflow-hidden shadow-sm bg-gray-100">
         <img
-          src={news.thumbnail}
+          src={getThumbnail()}
           alt={news.judul}
           className="w-full h-[300px] md:h-[450px] object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+          }}
         />
       </div>
 
       {/* Konten Berita (HTML) */}
       <div
-        className="prose prose-base md:prose-lg max-w-none text-gray-600 leading-relaxed prose-headings:text-[#0F172A] prose-headings:font-bold prose-h3:text-xl prose-h3:mt-8 prose-ul:list-disc prose-ul:pl-5 prose-li:mb-1"
+        className="prose prose-base md:prose-lg max-w-none text-gray-600 leading-relaxed prose-headings:text-[#0F172A] prose-headings:font-bold prose-h3:text-xl prose-h3:mt-8 prose-ul:list-disc prose-ul:pl-5 prose-li:mb-1 prose-a:text-[#F97316] prose-strong:text-[#0F172A]"
         dangerouslySetInnerHTML={{ __html: news.konten }}
       />
     </motion.div>
@@ -313,7 +207,33 @@ const NewsContent = ({ news }: { news: typeof newsDetailData }) => {
 };
 
 // --- KOMPONEN SIDEBAR ---
-const NewsSidebar = () => {
+interface NewsSidebarProps {
+  popularNews: News[];
+  categories: NewsCategory[];
+  onCategoryChange?: (category: string) => void;
+}
+
+const NewsSidebar = ({
+  popularNews,
+  categories,
+  onCategoryChange,
+}: NewsSidebarProps) => {
+  // Format tanggal
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // Fungsi untuk mendapatkan thumbnail
+  const getThumbnail = (thumbnail?: string): string => {
+    if (!thumbnail) return PLACEHOLDER_IMAGE;
+    return thumbnail.startsWith("http") ? thumbnail : getImageUrl(thumbnail);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
@@ -330,36 +250,186 @@ const NewsSidebar = () => {
       </div>
 
       {/* Berita Populer */}
-      <PopularNewsWidget />
-
-      {/* Artikel Terkait */}
-      <RelatedArticleWidget />
+      {popularNews.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h4 className="font-bold text-[#0F172A] text-lg mb-4">
+            Berita Populer
+          </h4>
+          <div className="space-y-4">
+            {popularNews.slice(0, 3).map((news) => (
+              <Link
+                key={news.id}
+                to={`/news/${news.slug}`}
+                className="flex gap-4 group"
+              >
+                <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                  <img
+                    src={getThumbnail(news.thumbnail)}
+                    alt={news.judul}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                    }}
+                  />
+                </div>
+                <div className="flex-grow min-w-0">
+                  <h5 className="text-sm font-semibold text-[#0F172A] group-hover:text-[#F97316] transition-colors line-clamp-2">
+                    {news.judul}
+                  </h5>
+                  <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                    <FaCalendar className="w-3 h-3" />
+                    <span>{formatDate(news.created_at)}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
 
 // ==========================================
-// 6. HALAMAN UTAMA NEWS DETAIL
+// HALAMAN UTAMA NEWS DETAIL
 // ==========================================
 const NewsDetailPage = () => {
-  return (
-    <>
+  const { slug } = useParams<{ slug: string }>();
+  const [news, setNews] = useState<News | null>(null);
+  const [allNews, setAllNews] = useState<News[]>([]);
+  const [categories, setCategories] = useState<NewsCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fungsi untuk mengambil data
+  const fetchNewsDetail = async () => {
+    if (!slug) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Ambil data berita detail, semua berita, dan kategori secara paralel
+      const [newsData, allNewsData, categoriesData] = await Promise.all([
+        newsAPI.getBySlug(slug),
+        newsAPI.getAll(),
+        newsAPI.getCategories(),
+      ]);
+
+      console.log("News Detail:", newsData);
+      console.log("All News:", allNewsData);
+      console.log("Categories:", categoriesData);
+
+      if (!newsData || !newsData.id) {
+        throw new Error("News not found");
+      }
+
+      setNews(newsData);
+      setAllNews(Array.isArray(allNewsData) ? allNewsData : []);
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+    } catch (err) {
+      console.error("Error fetching news detail:", err);
+      setError("Gagal mengambil detail berita. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNewsDetail();
+  }, [slug]);
+
+  // Fungsi untuk mendapatkan nama kategori
+  const getCategoryName = (categoryId: number): string => {
+    const category = categories.find((c) => c.id === categoryId);
+    return category ? category.kategori_berita : "Uncategorized";
+  };
+
+  // Fungsi untuk mendapatkan berita populer (selain berita ini)
+  const getPopularNews = (): News[] => {
+    if (!news) return [];
+    return allNews.filter((item) => item.id !== news.id).slice(0, 5);
+  };
+
+  // Fungsi untuk handle perubahan kategori (redirect ke halaman news dengan filter)
+  const handleCategoryChange = (categoryName: string) => {
+    window.location.href = `/news?category=${encodeURIComponent(categoryName)}`;
+  };
+
+  // Loading state
+  if (loading) {
+    return (
       <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
         <div className="container mx-auto px-4 md:px-8 max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
-            {/* KOLOM KIRI & TENGAH: Konten Utama (2/3 lebar) */}
-            <div className="lg:col-span-2">
-              <NewsContent news={newsDetailData} />
-            </div>
-
-            {/* KOLOM KANAN: Sidebar (1/3 lebar) */}
-            <div className="lg:col-span-1">
-              <NewsSidebar />
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-[#F97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Memuat detail berita...</p>
             </div>
           </div>
         </div>
       </section>
-    </>
+    );
+  }
+
+  // Error state
+  if (error || !news) {
+    return (
+      <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
+        <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <p className="text-red-500 text-lg mb-4">
+              {error || "Berita tidak ditemukan"}
+            </p>
+            <button
+              onClick={fetchNewsDetail}
+              className="px-6 py-3 bg-[#F97316] text-white rounded-md hover:bg-[#E8650A] transition-colors"
+            >
+              Coba Lagi
+            </button>
+            <Link to="/news" className="mt-4 text-[#F97316] hover:underline">
+              Kembali ke Berita
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const popularNews = getPopularNews();
+  const categoryName = getCategoryName(news.id_kategori_berita);
+
+  return (
+    <section className="pt-32 pb-20 bg-[#F8FAFC] min-h-screen">
+      <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
+          {/* KOLOM KIRI & TENGAH: Konten Utama (2/3 lebar) */}
+          <div className="lg:col-span-2">
+            <NewsContent news={news} categoryName={categoryName} />
+          </div>
+
+          {/* KOLOM KANAN: Sidebar (1/3 lebar) */}
+          <div className="lg:col-span-1">
+            <NewsSidebar
+              popularNews={popularNews}
+              categories={categories}
+              onCategoryChange={handleCategoryChange}
+            />
+          </div>
+        </div>
+
+        {/* Tombol Kembali ke Semua Berita */}
+        <div className="mt-12 text-center">
+          <Link
+            to="/news"
+            className="inline-flex items-center gap-2 text-[#0F172A] hover:text-[#F97316] transition-colors font-medium"
+          >
+            <FaArrowRight className="rotate-180" />
+            Kembali ke Semua Berita
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 };
 
